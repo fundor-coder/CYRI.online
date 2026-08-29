@@ -95,6 +95,34 @@ test("production image packages the public CYRI favicon files", async () => {
   }
 });
 
+test("Node and Apache serve exactly the same public asset files", async () => {
+  const root = path.join(__dirname, "..");
+  const htaccess = await fs.readFile(path.join(root, ".htaccess"), "utf8");
+  const server = await fs.readFile(path.join(root, "server.js"), "utf8");
+
+  const condition = htaccess.match(/RewriteCond %\{REQUEST_URI\} !(\^\/assets\/\S+\$) \[NC\]/);
+  assert.ok(condition, ".htaccess must keep one asset allowlist condition.");
+  const apacheAllowlist = new RegExp(condition[1], "i");
+
+  const setLiteral = server.match(/const PUBLIC_ASSET_PATHS = new Set\(\[([\s\S]*?)\n\]\);/);
+  assert.ok(setLiteral, "server.js must keep the PUBLIC_ASSET_PATHS allowlist.");
+  const nodeAllowlist = new Set(new Function(`return [${setLiteral[1]}]`)());
+
+  const assetFiles = (await fs.readdir(path.join(root, "assets"), { recursive: true }))
+    .map((entry) => `/assets/${entry.split(path.sep).join("/")}`)
+    .filter((entry) => !entry.split("/").pop().startsWith("."));
+
+  for (const file of assetFiles) {
+    const stats = await fs.stat(path.join(root, file.slice(1)));
+    if (stats.isDirectory()) continue;
+    assert.equal(
+      apacheAllowlist.test(file),
+      nodeAllowlist.has(file),
+      `${file} must be public on Node and Apache, or blocked on both.`
+    );
+  }
+});
+
 test("contact backend validates, stores and securely delivers messages", async (t) => {
   const providerRequests = [];
   const provider = http.createServer(async (req, res) => {
