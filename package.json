@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "check": "node --check app.js && node --check server.js && node --input-type=module --check < assets/learning-3d.js",
+    "check": "node --check app.js && node --check server.js && node --input-type=module --check < assets/learning-3d.js && node --input-type=module --check < assets/antigravity.js",
     "test:backend": "node --test tests/contact-backend.test.js",
     "test:browser": "playwright test tests/browser-smoke.spec.js"
   },

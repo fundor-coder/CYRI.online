@@ -12,6 +12,9 @@ Funding notice:
 Student info experience:
 - The `Explore` page puts interactive missions, models and environmental facts before passive reading.
 - Visitors can switch between oceans, climate ecosystems and climate-ready cities.
+- The home-page particle field can optionally follow the visitor through the front-facing camera.
+  Camera access starts only after a click; low-resolution frames are analysed in browser memory
+  and are never uploaded or stored. Mouse and trackpad control remain available as the fallback.
 - Mission, quiz and discovery choices are stored locally in the visitor's browser.
 - The Mission Lab lets visitors combine an environmental challenge, perspective and time frame into a live info model, animated impact cockpit, field kit, mini experiment, discussion prompt and action plan.
 - The SDG Lab turns all 17 Sustainable Development Goals into clickable student cards with short explanations, reflection questions and links into the map models.

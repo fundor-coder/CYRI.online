@@ -123,6 +123,41 @@ test("homepage SDG cards open official logo details accessibly", async ({ page }
   await modal.screenshot({ path: "/tmp/cyri-home-sdg-detail-mobile.png" });
 });
 
+test("selfie-camera tracking starts and releases its local video stream", async ({ page }) => {
+  await page.addInitScript(() => {
+    const testCanvas = document.createElement("canvas");
+    testCanvas.width = 160;
+    testCanvas.height = 90;
+    const context = testCanvas.getContext("2d");
+    context.fillStyle = "#16835f";
+    context.fillRect(0, 0, testCanvas.width, testCanvas.height);
+    const stream = testCanvas.captureStream(12);
+    window.__cyriCameraTestStream = stream;
+    Object.defineProperty(navigator, "mediaDevices", {
+      configurable: true,
+      value: { getUserMedia: async () => stream },
+    });
+  });
+  await setAdultMode(page, null, "de");
+  await page.goto("http://127.0.0.1:5173/#home");
+
+  const toggle = page.locator("[data-camera-tracking-toggle]");
+  await expect(toggle).toHaveText(/Selfie-Kamera verwenden/);
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-pressed", "true");
+  await expect(toggle).toHaveAttribute("data-camera-state", "activeMotion");
+  await expect(page.locator("[data-camera-tracking-status]")).toContainText(
+    "kein Video wird hochgeladen oder gespeichert"
+  );
+
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-pressed", "false");
+  await expect(toggle).toHaveAttribute("data-camera-state", "stopped");
+  expect(
+    await page.evaluate(() => window.__cyriCameraTestStream.getVideoTracks()[0].readyState)
+  ).toBe("ended");
+});
+
 test("learning balloon title toggles a dark-green neon light", async ({ page }) => {
   await setAdultMode(page, null, "de");
   await page.setViewportSize({ width: 1280, height: 900 });
@@ -524,6 +559,11 @@ test("global layout remains within the viewport on desktop, iPad, and iPhone", a
     await page.goto("http://127.0.0.1:5173/#home");
     await expect(page.locator(".hero h1")).toBeVisible();
     await expect(page.locator(".hero .photo-frame")).toBeVisible();
+    await expect(page.locator("[data-camera-tracking-toggle]")).toBeVisible();
+    await expect(page.locator("[data-camera-tracking-toggle]")).toHaveAttribute(
+      "aria-pressed",
+      "false"
+    );
     const hasOverflow = await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1
     );

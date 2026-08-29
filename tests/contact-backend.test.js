@@ -174,6 +174,10 @@ test("contact backend validates, stores and securely delivers messages", async (
   }
   const homeResponse = await fetch(`${baseUrl}/`);
   assert.equal(homeResponse.status, 200);
+  assert.equal(
+    homeResponse.headers.get("permissions-policy"),
+    "camera=(self), geolocation=(), microphone=(), payment=(), usb=()"
+  );
   const homeHtml = await homeResponse.text();
   assert.match(
     homeHtml,
@@ -182,6 +186,7 @@ test("contact backend validates, stores and securely delivers messages", async (
   assert.match(homeHtml, /<link rel="shortcut icon" href="\/favicon\.ico" \/>/);
   assert.match(homeHtml, /<link rel="apple-touch-icon" href="\/apple-touch-icon\.png"/);
   assert.match(homeHtml, /https:\/\/cyri\.online\/assets\/cyri-logo-512\.png/);
+  assert.match(homeHtml, /data-camera-tracking-toggle/);
 
   const privatePaths = [
     "/README.md",

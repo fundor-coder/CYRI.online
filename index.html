@@ -42,11 +42,11 @@
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
     <link rel="preload" href="assets/photos/coral-reef-bleaching-hd.webp" as="image" type="image/webp" fetchpriority="high" />
-    <link rel="stylesheet" href="styles.css?v=20260728-4" />
+    <link rel="stylesheet" href="styles.css?v=20260804-1" />
     <script src="app.js?v=20260727-12" defer></script>
     <script src="assets/specular-buttons.js?v=20260728-1" defer></script>
     <script src="assets/option-wheel.js?v=20260728-2" defer></script>
-    <script type="module" src="assets/antigravity.js?v=20260728-1"></script>
+    <script type="module" src="assets/antigravity.js?v=20260804-1"></script>
     <script type="application/ld+json" id="seo-structured-data">
       {
         "@context": "https://schema.org",
@@ -163,7 +163,26 @@
                 <a class="button button-secondary" href="/en/articles" data-route-link="articles" data-i18n="hero.secondaryCta">
                   Read articles
                 </a>
+                <button
+                  class="button button-camera"
+                  type="button"
+                  data-camera-tracking-toggle
+                  aria-pressed="false"
+                  aria-describedby="camera-tracking-status"
+                >
+                  <span class="camera-indicator" aria-hidden="true"></span>
+                  <span data-camera-tracking-label>Use selfie camera</span>
+                </button>
               </div>
+              <p
+                class="camera-tracking-status"
+                id="camera-tracking-status"
+                data-camera-tracking-status
+                role="status"
+                aria-live="polite"
+              >
+                Optional: move the particles with your MacBook camera. Video stays on this device.
+              </p>
             </div>
 
             <figure class="hero-visual photo-frame reveal">
@@ -855,6 +874,15 @@
               <h2 data-i18n="legal.localStorageTitle">Data on this device</h2>
               <p data-i18n="legal.localStorageText">
                 Language, game progress, badges and selected settings are stored locally in the browser. They are not a public profile and can be deleted through the browser settings.
+              </p>
+            </article>
+            <article class="legal-card reveal">
+              <h2 data-i18n="legal.cameraTitle">Optional camera tracking</h2>
+              <p data-i18n="legal.cameraText">
+                Camera tracking starts only after you press the camera button and grant browser
+                permission. Frames are analysed locally in volatile browser memory to control the
+                particle animation; no camera image is stored or sent to CYRI or third parties. You
+                can stop access with the same button or through your browser settings.
               </p>
             </article>
             <article class="legal-card reveal">

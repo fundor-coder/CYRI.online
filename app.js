@@ -2425,6 +2425,9 @@ const content = {
       localStorageTitle: "Data on this device",
       localStorageText:
         "Language, game progress, badges and selected settings are stored locally in the browser. They are not a public profile and can be deleted through the browser settings.",
+      cameraTitle: "Optional camera tracking",
+      cameraText:
+        "Camera tracking starts only after you press the camera button and grant browser permission. Frames are analysed locally in volatile browser memory to control the particle animation; no camera image is stored or sent to CYRI or third parties. You can stop access with the same button or through your browser settings.",
       rightsTitle: "Your rights",
       rightsText:
         "You may request access, correction, deletion, restriction, portability or object to processing. You may withdraw consent at any time and lodge a complaint with a data-protection authority.",
@@ -3101,6 +3104,9 @@ const content = {
       localStorageTitle: "Daten auf diesem Gerät",
       localStorageText:
         "Sprache, Spielfortschritt, Badges und ausgewählte Einstellungen werden lokal im Browser gespeichert. Sie bilden kein öffentliches Profil und können über die Browser-Einstellungen gelöscht werden.",
+      cameraTitle: "Optionales Kamera-Tracking",
+      cameraText:
+        "Das Kamera-Tracking startet erst, nachdem du den Kamera-Button gedrückt und die Browser-Berechtigung erteilt hast. Einzelbilder werden ausschließlich lokal im flüchtigen Arbeitsspeicher des Browsers ausgewertet, um die Partikelanimation zu steuern; es wird kein Kamerabild gespeichert oder an CYRI oder Dritte gesendet. Du kannst den Zugriff über denselben Button oder in den Browser-Einstellungen beenden.",
       rightsTitle: "Deine Rechte",
       rightsText:
         "Du kannst Auskunft, Berichtigung, Löschung, Einschränkung oder Datenübertragbarkeit verlangen und der Verarbeitung widersprechen. Eine Einwilligung kann jederzeit widerrufen und eine Datenschutzaufsichtsbehörde kontaktiert werden.",
