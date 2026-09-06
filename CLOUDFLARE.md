@@ -23,11 +23,21 @@ gleiche Fehlermeldungen — nur der Speicher ist ein anderer.
 
 ## Deployen
 
+Das Repo ist mit Cloudflare Workers Builds verbunden: **jeder Push auf `main`
+baut und deployt automatisch**. Build-Logs stehen im Dashboard unter
+Workers & Pages → `cyri` → Builds. Commits ohne Dateiänderung lösen keinen
+Build aus.
+
+Von Hand geht es weiterhin:
+
 ```bash
-npm run build        # baut dist/ aus der Datei-Allowlist
-npm run cf:deploy    # build + wrangler deploy
+npm run cf:deploy    # wrangler deploy (baut dist/ selbst)
 npm run cf:dev       # lokal auf http://localhost:8788
+npm run build        # nur dist/ bauen
 ```
+
+`wrangler.jsonc` enthält `build.command`, deshalb baut jedes `wrangler deploy`
+das Asset-Verzeichnis neu - lokal wie im Cloudflare-Build.
 
 `dist/` enthält nur die öffentlich freigegebenen Dateien — dieselbe Allowlist wie
 in `.htaccess` und `server.js`. Private Ordner (`Antrag/`, `data/`, `tests/`)
