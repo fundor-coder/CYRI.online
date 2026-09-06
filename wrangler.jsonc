@@ -1,0 +1,49 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "cyri",
+  "account_id": "bc28b52fa018bb2e2d397f8aab8d0b54",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-08-01",
+  "workers_dev": true,
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "none",
+    "html_handling": "none",
+    // Everything the Worker owns: the API, uploaded images, the generated
+    // sitemap and every HTML route that needs server-rendered SEO tags.
+    // Static files (CSS, JS, photos, article JSON) are served straight from
+    // the asset store without invoking the Worker.
+    "run_worker_first": [
+      "/",
+      "/index.html",
+      "/api/*",
+      "/backend.php",
+      "/uploads/*",
+      "/sitemap.xml",
+      "/de",
+      "/de/*",
+      "/en",
+      "/en/*"
+    ]
+  },
+  "routes": [
+    { "pattern": "cyri.online", "custom_domain": true },
+    { "pattern": "www.cyri.online", "custom_domain": true }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "CYRI_DATA",
+      "id": "bb66887b4fc445c395226004d035969c"
+    }
+  ],
+  "vars": {
+    "CYRI_CONTACT_FROM": "CYRI Website <website@send.cyri.online>",
+    "CYRI_CONTACT_TO": "climateyri@gmail.com",
+    "OPENAI_TRANSLATION_MODEL": "gpt-5.4-mini",
+    "OPENAI_RESEARCH_MODEL": "gpt-5.4-mini"
+  },
+  "observability": {
+    "enabled": true
+  }
+}

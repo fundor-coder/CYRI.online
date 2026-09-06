@@ -16,3 +16,9 @@ test-results/
 # Private documents - never publish (public repo)
 Antrag/
 Drei passgenaue*.pdf
+
+# Cloudflare Workers build output
+dist/
+.wrangler/
+.dev.vars
+.dev.vars.*

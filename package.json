@@ -2,15 +2,19 @@
   "name": "cyri-website",
   "version": "1.0.0",
   "private": true,
-  "description": "CYRI website with PHP and Node-compatible backends for articles and contact messages.",
+  "description": "CYRI website: static frontend plus PHP, Node and Cloudflare Workers backends for articles and contact messages.",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "check": "node --check app.js && node --check server.js && node --input-type=module --check < assets/learning-3d.js && node --input-type=module --check < assets/antigravity.js",
+    "check": "node --check app.js && node --check server.js && node --input-type=module --check < assets/learning-3d.js && node --input-type=module --check < assets/antigravity.js && node --input-type=module --check < worker/index.js",
     "test:backend": "node --test tests/contact-backend.test.js",
-    "test:browser": "playwright test tests/browser-smoke.spec.js"
+    "test:browser": "playwright test tests/browser-smoke.spec.js",
+    "build": "node scripts/build-cloudflare.mjs",
+    "cf:dev": "npm run build && wrangler dev",
+    "cf:deploy": "npm run build && wrangler deploy"
   },
   "devDependencies": {
-    "@playwright/test": "^1.61.1"
+    "@playwright/test": "^1.61.1",
+    "wrangler": "^4.118.0"
   }
 }

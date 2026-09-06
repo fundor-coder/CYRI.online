@@ -4,6 +4,8 @@ A bilingual, youth-led environmental information platform for students with an i
 
 Run `npm start` and open `http://localhost:5173/` to view the site with the backend enabled.
 
+The site is deployed as a Cloudflare Worker with static assets; see [CLOUDFLARE.md](CLOUDFLARE.md) for deployment, secrets and the storage differences from the self-hosted backends.
+
 Funding notice:
 - The action! funding notice is integrated site-wide before the footer.
 - The supplied RGB funding logo remains unchanged, readable and displayed on a white background with protected spacing according to the funding guidelines.
