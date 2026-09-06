@@ -3,6 +3,11 @@
   "name": "cyri",
   "account_id": "bc28b52fa018bb2e2d397f8aab8d0b54",
   "main": "worker/index.js",
+  // Runs before every deploy - local and in Cloudflare's Git builds - so the
+  // asset directory is always rebuilt from the current source.
+  "build": {
+    "command": "node scripts/build-cloudflare.mjs"
+  },
   "compatibility_date": "2026-08-01",
   "workers_dev": true,
   "assets": {
