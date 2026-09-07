@@ -1034,7 +1034,6 @@ function structuredDataForSeo({ route, article, canonicalUrl, title, description
       email: "climateyri@gmail.com",
       founder: [
         { "@type": "Person", name: "Tobias Göppert" },
-        { "@type": "Person", name: "Jarne Bub" },
       ],
       sameAs: [
         "https://www.instagram.com/cyri.de/",

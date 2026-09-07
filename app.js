@@ -1803,7 +1803,7 @@ const content = {
         about: {
           title: "About CYRI | Youth-led Environmental Education",
           description:
-            "Read about CYRI, a two-person youth-led environmental info platform currently in development in Germany.",
+            "Read about CYRI, an independent youth-led environmental info platform currently in development in Germany.",
         },
         publish: {
           title: "Publish | CYRI",
@@ -2282,11 +2282,6 @@ const content = {
           role: "Co-founder & education lead",
           text: "Co-founded CYRI and leads educational direction, editorial standards, info formats and source-based environmental content.",
         },
-        {
-          name: "Jarne Bub",
-          role: "Co-founder & operations lead",
-          text: "Co-founded CYRI and leads platform organization, publishing workflows, format development and quality control.",
-        },
       ],
     },
     contact: {
@@ -2357,7 +2352,7 @@ const content = {
       providerEyebrow: "Information according to § 5 DDG",
       providerTitle: "Provider",
       projectLabel: "Project",
-      operatorLabel: "Operators",
+      operatorLabel: "Operator",
       statusLabel: "Status",
       statusText:
         "Independent youth-led initiative currently in its public launch phase; not a registered NGO or incorporated association.",
@@ -2367,7 +2362,7 @@ const content = {
       editorialEyebrow: "Editorial responsibility",
       editorialTitle: "Responsible under § 18 Abs. 2 MStV",
       editorialText:
-        "Tobias Göppert and Jarne Bub are responsible for editorial article content. Responsible contact: Tobias Göppert, Aachener Straße 238, 40223 Düsseldorf, Germany.",
+        "Tobias Göppert is responsible for editorial article content. Responsible contact: Tobias Göppert, Aachener Straße 238, 40223 Düsseldorf, Germany.",
       publisherResponsibilityEyebrow: "Funded content",
       publisherResponsibilityTitle: "Responsibility for CYRI content",
       publisherResponsibilityText:
@@ -2385,19 +2380,19 @@ const content = {
       privacyEyebrow: "Privacy",
       privacyTitle: "Privacy notice",
       privacyIntro:
-        "This website sends contact messages and protected publishing requests to the CYRI backend.",
+        "This website sends assistant questions and protected publishing requests to the CYRI backend.",
       localDataTitle: "Backend data",
       localDataText:
-        "Contact messages are sent to CYRI through the email delivery provider Resend and stored on the server for up to six months unless legal obligations require longer storage.",
+        "Published articles and uploaded article photos are stored on the server. The website receives no messages from visitors and therefore stores none.",
       controllerTitle: "Controller and contact",
       controllerText:
-        "CYRI, operated by Tobias Göppert and Jarne Bub, is responsible for this website. Privacy questions can be sent to climateyri@gmail.com.",
+        "CYRI, operated by Tobias Göppert, is responsible for this website. Privacy questions can be sent to climateyri@gmail.com.",
       processingTitle: "What is processed",
       processingText:
-        "The hosting provider and Resend may process technical and delivery data. Contact forms process name, email address and message. The CYRI assistant sends the entered question to the configured AI provider only after consent.",
+        "The hosting provider may process technical log data. The website has no contact form and stores no messages. The CYRI assistant sends the entered question to the configured AI provider only after consent.",
       basisTitle: "Purposes and legal bases",
       basisText:
-        "Technical logs are processed for secure website operation on the basis of legitimate interests under Article 6(1)(f) GDPR. Contact data is processed to answer the request under Article 6(1)(b) or (f) GDPR. AI questions are processed only with consent under Article 6(1)(a) GDPR, which can be withdrawn for the future.",
+        "Technical logs are processed for secure website operation on the basis of legitimate interests under Article 6(1)(f) GDPR. AI questions are processed only with consent under Article 6(1)(a) GDPR, which can be withdrawn for the future.",
       localStorageTitle: "Data on this device",
       localStorageText:
         "Language, game progress, badges and selected settings are stored locally in the browser. They are not a public profile and can be deleted through the browser settings.",
@@ -2457,7 +2452,7 @@ const content = {
         about: {
           title: "Über CYRI | Jugendgeführte Umweltbildung",
           description:
-            "Erfahre mehr über CYRI, eine zweiköpfige jugendgeführte Plattform für Umweltbildung im Aufbau in Deutschland.",
+            "Erfahre mehr über CYRI, eine unabhängige jugendgeführte Plattform für Umweltbildung im Aufbau in Deutschland.",
         },
         publish: {
           title: "Publizieren | CYRI",
@@ -2472,7 +2467,7 @@ const content = {
         privacy: {
           title: "Datenschutz | CYRI",
           description:
-            "Datenschutzhinweise für das CYRI-Website-Backend und Kontaktformulare.",
+            "Datenschutzhinweise für das CYRI-Website-Backend und den Redaktionsbereich.",
         },
       },
     },
@@ -2937,11 +2932,6 @@ const content = {
           role: "Mitgründer & Bildungsleitung",
           text: "Hat CYRI mitgegründet und leitet Bildungsstrategie, redaktionelle Standards, Infoformate und quellenbasierte Umweltinhalte.",
         },
-        {
-          name: "Jarne Bub",
-          role: "Mitgründer & Organisation",
-          text: "Hat CYRI mitgegründet und leitet Plattformorganisation, Veröffentlichungsabläufe, Formatentwicklung und Qualitätskontrolle.",
-        },
       ],
     },
     contact: {
@@ -3022,7 +3012,7 @@ const content = {
       editorialEyebrow: "Redaktionelle Verantwortung",
       editorialTitle: "Verantwortlich nach § 18 Abs. 2 MStV",
       editorialText:
-        "Tobias Göppert und Jarne Bub sind für redaktionelle Artikelinhalte verantwortlich. Verantwortliche Kontaktperson: Tobias Göppert, Aachener Straße 238, 40223 Düsseldorf, Deutschland.",
+        "Tobias Göppert ist für redaktionelle Artikelinhalte verantwortlich. Verantwortliche Kontaktperson: Tobias Göppert, Aachener Straße 238, 40223 Düsseldorf, Deutschland.",
       publisherResponsibilityEyebrow: "Geförderte Inhalte",
       publisherResponsibilityTitle: "Verantwortung für CYRI-Inhalte",
       publisherResponsibilityText:
@@ -3040,19 +3030,19 @@ const content = {
       privacyEyebrow: "Datenschutz",
       privacyTitle: "Datenschutzhinweis",
       privacyIntro:
-        "Diese Website sendet Kontaktanfragen und geschützte Veröffentlichungsanfragen an das CYRI-Backend.",
+        "Diese Website sendet Assistenzfragen und geschützte Veröffentlichungsanfragen an das CYRI-Backend.",
       localDataTitle: "Serverdaten",
       localDataText:
-        "Kontaktanfragen werden über den E-Mail-Versanddienst Resend an CYRI gesendet und bis zu sechs Monate auf dem Server gespeichert, sofern keine gesetzlichen Pflichten eine längere Speicherung erfordern.",
+        "Auf dem Server werden veröffentlichte Artikel und hochgeladene Artikelfotos gespeichert. Die Website nimmt keine Nachrichten von Besucherinnen und Besuchern entgegen und speichert daher auch keine.",
       controllerTitle: "Verantwortliche und Kontakt",
       controllerText:
-        "Für diese Website ist CYRI, betrieben von Tobias Göppert und Jarne Bub, verantwortlich. Datenschutzfragen können an climateyri@gmail.com gesendet werden.",
+        "Für diese Website ist CYRI, betrieben von Tobias Göppert, verantwortlich. Datenschutzfragen können an climateyri@gmail.com gesendet werden.",
       processingTitle: "Welche Daten verarbeitet werden",
       processingText:
-        "Der Hosting-Anbieter und Resend können technische Protokoll- und Zustelldaten verarbeiten. Das Kontaktformular verarbeitet Name, E-Mail-Adresse und Nachricht. Der CYRI-Assistent sendet die eingegebene Frage erst nach Einwilligung an den eingerichteten KI-Anbieter.",
+        "Der Hosting-Anbieter kann technische Protokolldaten verarbeiten. Die Website hat kein Kontaktformular und speichert keine Nachrichten. Der CYRI-Assistent sendet die eingegebene Frage erst nach Einwilligung an den eingerichteten KI-Anbieter.",
       basisTitle: "Zwecke und Rechtsgrundlagen",
       basisText:
-        "Technische Protokolldaten werden für den sicheren Websitebetrieb auf Grundlage berechtigter Interessen nach Art. 6 Abs. 1 lit. f DSGVO verarbeitet. Kontaktdaten werden zur Beantwortung nach Art. 6 Abs. 1 lit. b oder f DSGVO verarbeitet. KI-Fragen werden nur mit Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO verarbeitet; die Einwilligung kann für die Zukunft widerrufen werden.",
+        "Technische Protokolldaten werden für den sicheren Websitebetrieb auf Grundlage berechtigter Interessen nach Art. 6 Abs. 1 lit. f DSGVO verarbeitet. KI-Fragen werden nur mit Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO verarbeitet; die Einwilligung kann für die Zukunft widerrufen werden.",
       localStorageTitle: "Daten auf diesem Gerät",
       localStorageText:
         "Sprache, Spielfortschritt, Badges und ausgewählte Einstellungen werden lokal im Browser gespeichert. Sie bilden kein öffentliches Profil und können über die Browser-Einstellungen gelöscht werden.",
@@ -4166,7 +4156,6 @@ function updateStructuredData(article, pageUrl, pageTitle, pageDescription, soci
       email: "climateyri@gmail.com",
       founder: [
         { "@type": "Person", name: "Tobias Göppert" },
-        { "@type": "Person", name: "Jarne Bub" },
       ],
       sameAs: [
         "https://www.instagram.com/cyri.de/",
