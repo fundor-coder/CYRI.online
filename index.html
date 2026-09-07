@@ -42,10 +42,9 @@
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
     <link rel="preload" href="assets/photos/coral-reef-bleaching-hd.webp" as="image" type="image/webp" fetchpriority="high" />
-    <link rel="stylesheet" href="styles.css?v=20260804-1" />
-    <script src="app.js?v=20260804-1" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260907-1" />
+    <script src="app.js?v=20260907-1" defer></script>
     <script src="assets/specular-buttons.js?v=20260728-1" defer></script>
-    <script src="assets/option-wheel.js?v=20260728-2" defer></script>
     <script type="module" src="assets/antigravity.js?v=20260804-1"></script>
     <script type="application/ld+json" id="seo-structured-data">
       {
@@ -114,29 +113,14 @@
           </button>
         </div>
 
-        <div
-          class="nav-panel"
-          id="primary-navigation"
-          data-nav-panel
-          aria-hidden="true"
-        >
-          <div class="option-wheel-heading">
-            <strong data-option-wheel-title>Menu</strong>
-            <small data-option-wheel-hint>Scroll · drag · arrow keys</small>
-          </div>
-          <div
-            class="nav-links option-wheel option-wheel--right"
-            data-option-wheel
-            role="listbox"
-            tabindex="0"
-            aria-label="Primary navigation"
-          >
-            <a class="option-wheel__item" role="option" href="/en/" data-route-link="home" data-nav-link="home" data-i18n="nav.home">Home</a>
-            <a class="option-wheel__item" role="option" href="/en/#mission" data-route-link="mission" data-nav-link="mission" data-i18n="nav.mission">Mission</a>
-            <a class="option-wheel__item" role="option" href="/en/learn" data-route-link="learn" data-nav-link="learn" data-i18n="nav.learn">Learn</a>
-            <a class="option-wheel__item" role="option" href="/en/about" data-route-link="about" data-nav-link="about" data-i18n="nav.about">About</a>
-            <a class="option-wheel__item" role="option" href="/en/contact" data-route-link="contact" data-nav-link="contact" data-i18n="nav.contact">Contact</a>
-          </div>
+        <div class="nav-panel" id="primary-navigation" data-nav-panel>
+          <ul class="nav-links">
+            <li><a href="/en/" data-route-link="home" data-nav-link="home" data-i18n="nav.home">Home</a></li>
+            <li><a href="/en/#mission" data-route-link="mission" data-nav-link="mission" data-i18n="nav.mission">Mission</a></li>
+            <li><a class="nav-link--primary" href="/en/learn" data-route-link="learn" data-nav-link="learn" data-i18n="nav.learn">Learn</a></li>
+            <li><a href="/en/about" data-route-link="about" data-nav-link="about" data-i18n="nav.about">About</a></li>
+            <li><a href="/en/contact" data-route-link="contact" data-nav-link="contact" data-i18n="nav.contact">Contact</a></li>
+          </ul>
         </div>
       </nav>
     </header>

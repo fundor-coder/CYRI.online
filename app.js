@@ -7029,10 +7029,8 @@ function navigateToRoute(page, options = {}) {
 function closeMenu() {
   const header = document.querySelector("[data-header]");
   const toggle = document.querySelector("[data-menu-toggle]");
-  const panel = document.querySelector("[data-nav-panel]");
   header.classList.remove("is-menu-open");
   toggle.setAttribute("aria-expanded", "false");
-  panel?.setAttribute("aria-hidden", "true");
 }
 
 function createArticleId(title) {
@@ -7848,25 +7846,19 @@ document.addEventListener("input", (event) => {
 document.querySelector("[data-menu-toggle]").addEventListener("click", () => {
   const header = document.querySelector("[data-header]");
   const toggle = document.querySelector("[data-menu-toggle]");
-  const panel = document.querySelector("[data-nav-panel]");
   const isOpen = header.classList.toggle("is-menu-open");
   toggle.setAttribute("aria-expanded", String(isOpen));
-  panel?.setAttribute("aria-hidden", String(!isOpen));
   if (isOpen) {
     document.dispatchEvent(new CustomEvent("cyri:menu-open"));
-    requestAnimationFrame(() => document.querySelector("[data-option-wheel]")?.focus());
+    requestAnimationFrame(() =>
+      document.querySelector("[data-nav-panel] a")?.focus()
+    );
   }
 });
 
 document.addEventListener("pointerdown", (event) => {
   const header = document.querySelector("[data-header]");
-  const clickedPanelBackdrop =
-    event.target.closest("[data-nav-panel]") &&
-    !event.target.closest("[data-option-wheel]");
-  if (
-    header.classList.contains("is-menu-open") &&
-    (!header.contains(event.target) || clickedPanelBackdrop)
-  ) {
+  if (header.classList.contains("is-menu-open") && !header.contains(event.target)) {
     closeMenu();
   }
 });

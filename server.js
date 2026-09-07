@@ -257,7 +257,6 @@ const PUBLIC_ASSET_PATHS = new Set([
   "/assets/cyri-logo.svg",
   "/assets/antigravity.js",
   "/assets/learning-3d.js",
-  "/assets/option-wheel.js",
   "/assets/specular-buttons.js",
   "/assets/photos/aletsch-glacier-hd.jpg",
   "/assets/photos/coral-bleaching-florida-2023-hd.jpg",

@@ -12,7 +12,7 @@ Options -Indexes
   RewriteRule (^|/)\.(?!well-known(?:/|$)) - [R=404,L,NC]
   RewriteRule \.(?:pdf|docx?|xlsx?|pptx?|odt|ods|odp|rtf|csv|zip|tar|gz|tgz|7z|rar|key|pem|p12|pfx|sqlite3?|db|log|bak|tmp|map)(?:/|$) - [R=404,L,NC]
   RewriteRule ^content/(?!articles(?:-2026-expansion)?\.json$) - [R=404,L,NC]
-  RewriteCond %{REQUEST_URI} !^/assets/(?:action-funding-logo-rgb\.(?:jpg|webp)|cyri-logo\.svg|cyri-logo-(?:192|512)\.png|(?:antigravity|learning-3d|option-wheel|specular-buttons)\.js|photos/(?:aletsch-glacier-hd\.jpg|coral-bleaching-florida-2023-hd\.jpg|coral-reef-bleaching-hd\.(?:jpg|webp)|mangrove-forest-hd\.jpg|ocean-plastic-hd\.jpg|offshore-wind-hd\.jpg|seagrass-meadow-zostera-hd\.jpg|sponge-city-rain-garden-hd\.jpg)|sdg/E_SDG_Icons-(?:0[1-9]|1[0-7])\.jpg|vendor/three/three\.(?:core|module)\.min\.js)$ [NC]
+  RewriteCond %{REQUEST_URI} !^/assets/(?:action-funding-logo-rgb\.(?:jpg|webp)|cyri-logo\.svg|cyri-logo-(?:192|512)\.png|(?:antigravity|learning-3d|specular-buttons)\.js|photos/(?:aletsch-glacier-hd\.jpg|coral-bleaching-florida-2023-hd\.jpg|coral-reef-bleaching-hd\.(?:jpg|webp)|mangrove-forest-hd\.jpg|ocean-plastic-hd\.jpg|offshore-wind-hd\.jpg|seagrass-meadow-zostera-hd\.jpg|sponge-city-rain-garden-hd\.jpg)|sdg/E_SDG_Icons-(?:0[1-9]|1[0-7])\.jpg|vendor/three/three\.(?:core|module)\.min\.js)$ [NC]
   RewriteRule ^assets/ - [R=404,L,NC]
   RewriteRule ^(?:README\.md|LOESUNGEN\.md|server\.js|package(?:-lock)?\.json|Dockerfile|compose\.ya?ml|\.dockerignore|\.gitignore|\.env.*)$ - [R=404,L,NC]
   RewriteRule ^api/?$ backend.php?route=/health [L,QSA]

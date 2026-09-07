@@ -226,153 +226,28 @@ img {
 }
 
 .nav-actions {
+  order: 2;
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
+/* Im Markup steht das Menue hinter den Aktionen, angezeigt gehoert es davor:
+   Logo links, Menue in der Mitte, Sprache und Umschalter rechts. */
 .nav-panel {
-  position: absolute;
-  top: calc(100% + 14px);
-  right: calc((100vw - min(1180px, calc(100vw - 64px))) / -2);
-  width: min(620px, 100vw);
-  height: calc(100dvh - 106px);
-  min-height: 540px;
-  overflow: hidden;
-  border: 0;
-  border-radius: 52px 0 0 52px;
-  background:
-    radial-gradient(circle at 86% 42%, rgba(196, 235, 220, 0.5), transparent 36%),
-    linear-gradient(
-      90deg,
-      rgba(247, 251, 250, 0) 0%,
-      rgba(247, 251, 250, 0.64) 28%,
-      rgba(247, 251, 250, 0.94) 58%,
-      rgba(255, 255, 255, 0.98) 100%
-    );
-  box-shadow: -34px 0 70px rgba(34, 73, 67, 0.055);
-  clip-path: inset(0 0 0 100%);
-  opacity: 0;
-  pointer-events: none;
-  transform-origin: top right;
-  transition:
-    opacity 220ms ease,
-    clip-path 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
-  visibility: hidden;
-  backdrop-filter: blur(12px) saturate(125%);
-  -webkit-backdrop-filter: blur(12px) saturate(125%);
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 24%, #000 100%);
-  mask-image: linear-gradient(90deg, transparent 0%, #000 24%, #000 100%);
-}
-
-.site-header.is-menu-open .nav-panel {
-  clip-path: inset(0);
-  opacity: 1;
-  pointer-events: auto;
-  visibility: visible;
-}
-
-.option-wheel-heading {
-  position: absolute;
-  z-index: 3;
-  top: 24px;
-  right: 52px;
-  left: 42%;
+  order: 1;
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  color: var(--ink);
-  pointer-events: none;
+  align-items: center;
+  margin-left: auto;
 }
 
-.option-wheel-heading strong {
-  font-size: 0.86rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.option-wheel-heading small {
-  color: rgba(46, 60, 70, 0.52);
-  font-size: 0.68rem;
-}
-
-.option-wheel {
-  --ow-active-color: #132028;
-  --ow-text-color: #84928f;
-  --ow-font-size: clamp(1.65rem, 2.3vw, 2.2rem);
-  position: relative;
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  cursor: grab;
-  outline: none;
-  touch-action: none;
-  user-select: none;
-}
-
-.option-wheel.is-dragging {
-  cursor: grabbing;
-}
-
-.option-wheel::after {
-  position: absolute;
-  z-index: 2;
-  top: 50%;
-  right: 50px;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--green);
-  box-shadow: 0 0 18px rgba(22, 131, 95, 0.5);
-  content: "";
-  pointer-events: none;
-  transform: translateY(-50%);
-}
-
-.nav-links .option-wheel__item {
-  position: absolute;
-  top: 50%;
-  right: 74px;
-  left: auto;
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   margin: 0;
-  border: 0;
-  border-radius: 12px;
-  background: transparent;
-  box-shadow: none;
-  color: color-mix(
-    in srgb,
-    var(--ow-active-color) calc(var(--ow-position, 0) * 100%),
-    var(--ow-text-color)
-  );
-  cursor: pointer;
-  font-size: var(--ow-font-size);
-  font-weight: 430;
-  line-height: 1;
-  opacity: 0;
-  padding: 5px 14px;
-  transform-origin: right center;
-  white-space: nowrap;
-  will-change: transform, opacity, filter;
-}
-
-.nav-links .option-wheel__item:hover,
-.nav-links .option-wheel__item.is-active,
-.nav-links .option-wheel__item.option-wheel__item--selected {
-  border-color: transparent;
-  background: transparent;
-  box-shadow: none;
-  color: var(--ink);
-  text-shadow: 0 10px 28px rgba(22, 131, 95, 0.16);
-}
-
-.nav-links .option-wheel__item:focus-visible {
-  outline: 2px solid rgba(22, 131, 95, 0.58);
-  outline-offset: 2px;
-}
-
-.option-wheel__item--selected {
-  font-weight: 680 !important;
+  padding: 0;
+  list-style: none;
 }
 
 .nav-links a {
@@ -396,6 +271,22 @@ img {
     0 10px 24px rgba(27, 48, 65, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.98),
     inset 0 -1px 0 rgba(255, 255, 255, 0.42);
+}
+
+/* Der Einstieg ins Lernen ist das Hauptziel der Seite und bleibt deshalb
+   auch ohne Hover sichtbar hervorgehoben. */
+.nav-links a.nav-link--primary {
+  border-color: rgba(22, 131, 95, 0.28);
+  background: rgba(22, 131, 95, 0.1);
+  color: var(--green-deep, #14624a);
+  font-weight: 640;
+}
+
+.nav-links a.nav-link--primary:hover,
+.nav-links a.nav-link--primary.is-active {
+  border-color: rgba(22, 131, 95, 0.42);
+  background: rgba(22, 131, 95, 0.16);
+  color: var(--green-deep, #14624a);
 }
 
 .language-switcher {
@@ -494,7 +385,7 @@ img {
 }
 
 .menu-toggle {
-  display: block;
+  display: none;
   width: 42px;
   height: 42px;
   border: 1px solid var(--glass-line);
@@ -6038,27 +5929,47 @@ body[data-audience="children"] .modal-body h3 {
     min-height: 64px;
   }
 
+  /* Zu schmal fuer eine Leiste: das gleiche Menue klappt unter dem Header auf. */
+  .menu-toggle {
+    display: block;
+  }
+
   .nav-panel {
+    position: absolute;
     top: calc(100% + 10px);
-    right: -10px;
-    left: auto;
-    width: 100vw;
-    height: calc(100dvh - 74px);
-    min-height: 0;
-    border-radius: 34px 0 0 34px;
+    right: 0;
+    width: min(280px, calc(100vw - 32px));
+    border: 1px solid var(--glass-line);
+    border-radius: 22px;
+    background: #ffffff;
+    box-shadow: 0 24px 48px rgba(27, 48, 65, 0.18);
+    opacity: 0;
+    padding: 8px;
+    pointer-events: none;
+    transition: opacity 180ms ease, transform 180ms ease;
+    transform: translateY(-6px);
+    visibility: hidden;
+    backdrop-filter: blur(18px) saturate(125%);
+    -webkit-backdrop-filter: blur(18px) saturate(125%);
   }
 
-  .option-wheel-heading {
-    right: 32px;
-    left: 36%;
+  .site-header.is-menu-open .nav-panel {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+    visibility: visible;
   }
 
-  .option-wheel::after {
-    right: 28px;
+  .nav-links {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    width: 100%;
   }
 
-  .nav-links .option-wheel__item {
-    right: 50px;
+  .nav-links a {
+    display: block;
+    padding: 10px 14px;
   }
 
   .language-switcher {
@@ -6087,9 +5998,6 @@ body[data-audience="children"] .modal-body h3 {
     display: none;
   }
 
-  .option-wheel-heading small {
-    display: none;
-  }
 }
 
 @media (max-width: 680px) {
