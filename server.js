@@ -291,7 +291,7 @@ function currentPublishPasswordHash() {
 function securityHeaders() {
   return {
     "Content-Security-Policy":
-      "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob:; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'",
+      "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob:; object-src 'none'; script-src 'self'; style-src 'self'",
     "Permissions-Policy": "camera=(), geolocation=(), microphone=(), payment=(), usb=()",
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "Cross-Origin-Opener-Policy": "same-origin",

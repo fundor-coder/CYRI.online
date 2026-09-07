@@ -3785,6 +3785,34 @@ function renderLevelGoal(gameId, conditions) {
   `;
 }
 
+// Die CSP erlaubt keine style-Attribute mehr. Die Vorlagen schreiben ihre
+// Deklarationen deshalb nach data-style, und dieser Beobachter uebertraegt sie
+// nach dem Einfuegen ueber das CSSOM - das faellt nicht unter style-src.
+function applyDataStyle(element) {
+  const declarations = element.getAttribute("data-style");
+  if (declarations === null) return;
+  element.removeAttribute("data-style");
+  for (const part of declarations.split(";")) {
+    const separator = part.indexOf(":");
+    if (separator < 0) continue;
+    const name = part.slice(0, separator).trim();
+    const value = part.slice(separator + 1).trim();
+    if (name) element.style.setProperty(name, value);
+  }
+}
+
+function applyDataStyles(root) {
+  if (root.nodeType !== 1) return;
+  applyDataStyle(root);
+  root.querySelectorAll("[data-style]").forEach(applyDataStyle);
+}
+
+new MutationObserver((records) => {
+  for (const record of records) {
+    for (const node of record.addedNodes) applyDataStyles(node);
+  }
+}).observe(document.documentElement, { childList: true, subtree: true });
+
 function escapeHtml(value) {
   return String(value)
     .replace(/&/g, "&amp;")
@@ -4359,7 +4387,7 @@ function renderHomepageSdgs() {
               title: localizedValue(goal.title),
             })
           )}"
-          style="--sdg-color: ${goal.color}; --sdg-ink: ${contrastText(goal.color)}"
+          data-style="--sdg-color: ${goal.color}; --sdg-ink: ${contrastText(goal.color)}"
         >
           <span>${goal.number}</span>
           <strong>${escapeHtml(localizedValue(goal.title))}</strong>
@@ -4539,7 +4567,7 @@ function renderLearningTopics() {
             .map(
               (value) => `
                 <div class="lab-chart">
-                  <span style="--lab-value: ${value}%"></span>
+                  <span data-style="--lab-value: ${value}%"></span>
                   <strong>${value}%</strong>
                 </div>
               `
@@ -4768,7 +4796,7 @@ function renderMissionLab() {
         <div
           class="mission-holo"
           aria-label="${escapeHtml(t("learn.missionImpactMap"))}"
-          style="--holo-score: ${missionScore}%; --pulse-speed: ${Math.max(
+          data-style="--holo-score: ${missionScore}%; --pulse-speed: ${Math.max(
             3.2,
             7 - missionScore / 20
           )}s"
@@ -4787,7 +4815,7 @@ function renderMissionLab() {
               return `
                 <span
                   class="mission-node mission-node-${index + 1}"
-                  style="--node-x: ${position.x}%; --node-y: ${position.y}%; --node-strength: ${value}%"
+                  data-style="--node-x: ${position.x}%; --node-y: ${position.y}%; --node-strength: ${value}%"
                 >
                   <strong>${value}%</strong>
                   <small>${escapeHtml(label)}</small>
@@ -4797,7 +4825,7 @@ function renderMissionLab() {
             .join("")}
         </div>
         <section class="mission-model" aria-label="${escapeHtml(t("learn.missionModelTitle"))}">
-          <div class="mission-score" style="--score: ${missionScore}%">
+          <div class="mission-score" data-style="--score: ${missionScore}%">
             <span>${missionScore}</span>
             <small>${escapeHtml(t("learn.missionImpactScore"))}</small>
           </div>
@@ -4811,7 +4839,7 @@ function renderMissionLab() {
                       <span>${escapeHtml(label)}</span>
                       <strong>${value}%</strong>
                     </div>
-                    <i style="width: ${value}%"></i>
+                    <i data-style="width: ${value}%"></i>
                   </div>
                 `;
               })
@@ -4916,7 +4944,7 @@ function renderSdgLab() {
               role="listitem"
               data-sdg-goal="${goal.number}"
               aria-pressed="${active}"
-              style="--sdg-color: ${goal.color}; --sdg-ink: ${contrastText(goal.color)}"
+              data-style="--sdg-color: ${goal.color}; --sdg-ink: ${contrastText(goal.color)}"
             >
               <span>SDG ${goal.number}</span>
               <strong>${escapeHtml(localizedValue(goal.title))}</strong>
@@ -4926,7 +4954,7 @@ function renderSdgLab() {
         })
         .join("")}
     </div>
-    <article class="sdg-detail" style="--sdg-color: ${activeGoal.color}; --sdg-ink: ${contrastText(activeGoal.color)}">
+    <article class="sdg-detail" data-style="--sdg-color: ${activeGoal.color}; --sdg-ink: ${contrastText(activeGoal.color)}">
       <div class="sdg-detail-heading">
         <span>SDG ${activeGoal.number}</span>
         <h3>${escapeHtml(localizedValue(activeGoal.title))}</h3>
@@ -4977,7 +5005,7 @@ function renderGameMeter(label, value) {
         <span>${escapeHtml(label)}</span>
         <strong>${value}%</strong>
       </div>
-      <i style="width: ${value}%"></i>
+      <i data-style="width: ${value}%"></i>
     </div>
   `;
 }
@@ -5001,8 +5029,8 @@ function renderGameTarget(average, target, solved, outcome = "", rules = []) {
         aria-valuenow="${average}"
         aria-valuetext="${escapeHtml(status)}"
       >
-        <i style="width: ${average}%"></i>
-        <b style="left: ${target}%" aria-hidden="true"></b>
+        <i data-style="width: ${average}%"></i>
+        <b data-style="left: ${target}%" aria-hidden="true"></b>
       </div>
       <p>${escapeHtml(status)}</p>
       ${rules
@@ -5062,7 +5090,7 @@ function renderSprintOutcome(round, selected, correct) {
       ${cards
         .map(
           ([label, goal]) => `
-            <article class="sprint-outcome-card" style="--game-color: ${goal.color}">
+            <article class="sprint-outcome-card" data-style="--game-color: ${goal.color}">
               <span>${escapeHtml(label)}</span>
               <strong>SDG ${goal.number} · ${escapeHtml(localizedValue(goal.title))}</strong>
             </article>
@@ -5126,7 +5154,7 @@ function renderSdgSprintGame() {
                 type="button"
                 data-sdg-sprint-option="${number}"
                 ${answered ? "disabled" : ""}
-                style="--game-color: ${goal.color}; --game-ink: ${contrastText(goal.color)}"
+                data-style="--game-color: ${goal.color}; --game-ink: ${contrastText(goal.color)}"
               >
                 <span>SDG ${number}</span>
                 <strong>${escapeHtml(localizedValue(goal.title))}</strong>
@@ -5522,7 +5550,7 @@ function renderClimateCouncilGame() {
             const value = state.climatePlan[control.id] || 0;
             const title = localizedValue(control.title);
             return `
-              <article class="city-control-card climate-control-card" style="--control-color: ${CLIMATE_CONTROL_COLORS[index]}">
+              <article class="city-control-card climate-control-card" data-style="--control-color: ${CLIMATE_CONTROL_COLORS[index]}">
                 <div class="climate-control-copy">
                   <span class="climate-person-symbol" aria-hidden="true"><i></i>${speaking.has(control.id) ? '<b class="council-speak-mark">!</b>' : ""}</span>
                   <div>
@@ -5671,7 +5699,7 @@ function renderGameCelebration() {
           aria-label="${escapeHtml(t("learn.gameClose"))}"
         >×</button>
         <div class="game-celebration-burst" aria-hidden="true">
-          ${Array.from({ length: 16 }, (_, index) => `<i style="--particle: ${index}"></i>`).join("")}
+          ${Array.from({ length: 16 }, (_, index) => `<i data-style="--particle: ${index}"></i>`).join("")}
           <b>✓</b>
         </div>
         <div class="game-celebration-content">
@@ -6115,7 +6143,7 @@ function renderLearningGames() {
                   type="button"
                   data-game-duration="${track.minutes}"
                   aria-pressed="${active}"
-                  style="--medal-color: ${tier.color}; --medal-light: ${tier.light}"
+                  data-style="--medal-color: ${tier.color}; --medal-light: ${tier.light}"
                 >
                   <span class="game-medal-disc" aria-hidden="true"></span>
                   <strong>${escapeHtml(localizedValue(tier.label))}</strong>
@@ -6254,7 +6282,7 @@ function renderLearningMap() {
             <button
               class="map-marker${active ? " is-active" : ""}"
               type="button"
-              style="--x: ${hotspot.x}%; --y: ${hotspot.y}%"
+              data-style="--x: ${hotspot.x}%; --y: ${hotspot.y}%"
               data-map-hotspot="${escapeHtml(hotspot.id)}"
               aria-pressed="${active}"
             >
@@ -6293,7 +6321,7 @@ function renderLearningMap() {
                 type="button"
                 data-sdg-goal="${number}"
                 data-sdg-jump="true"
-                style="--sdg-color: ${goal.color}; --sdg-ink: ${contrastText(goal.color)}"
+                data-style="--sdg-color: ${goal.color}; --sdg-ink: ${contrastText(goal.color)}"
               >
                 <span>${escapeHtml(sdg)}</span>
                 ${escapeHtml(localizedValue(goal.title))}
@@ -6337,7 +6365,7 @@ function renderLearningMap() {
                     <span>${escapeHtml(metric)}</span>
                     <strong>${value}%</strong>
                   </div>
-                  <i style="width: ${value}%"></i>
+                  <i data-style="width: ${value}%"></i>
                 </div>
               `;
             })
@@ -6407,7 +6435,7 @@ function renderActionBuilder() {
               <div class="poll-result">
                 <span>${escapeHtml(localizedValue(option.title))}</span>
                 <strong>${percentage}%</strong>
-                <i style="width: ${percentage}%"></i>
+                <i data-style="width: ${percentage}%"></i>
               </div>
             `;
           })
@@ -6515,7 +6543,7 @@ function renderLearningQuiz() {
       )}</span>
       <span>${state.quizIndex + 1}/${state.quizLength}</span>
     </div>
-    <div class="quiz-progress"><span style="width: ${progress}%"></span></div>
+    <div class="quiz-progress"><span data-style="width: ${progress}%"></span></div>
     <h3 class="quiz-question">${escapeHtml(question.question[state.lang])}</h3>
     <div class="quiz-options">
       ${question.options[state.lang]
