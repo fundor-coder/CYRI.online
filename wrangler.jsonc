@@ -43,8 +43,6 @@
     }
   ],
   "vars": {
-    "CYRI_CONTACT_FROM": "CYRI Website <website@send.cyri.online>",
-    "CYRI_CONTACT_TO": "climateyri@gmail.com",
     "OPENAI_TRANSLATION_MODEL": "gpt-5.4-mini",
     "OPENAI_RESEARCH_MODEL": "gpt-5.4-mini"
   },

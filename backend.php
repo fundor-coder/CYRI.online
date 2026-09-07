@@ -9,17 +9,11 @@ header('X-Frame-Options: DENY');
 
 const SESSION_DURATION_SECONDS = 43200;
 const MAX_BODY_SIZE = 4194304;
-const MAX_CONTACT_BODY_SIZE = 16384;
 const MAX_UPLOAD_SIZE = 2621440;
-const CONTACT_MIN_FORM_AGE_MS = 1500;
-const CONTACT_RETENTION_SECONDS = 15811200;
-const RESEND_EMAILS_URL = 'https://api.resend.com/emails';
 const RESEARCH_RATE_LIMIT_SECONDS = 600;
 const RESEARCH_RATE_LIMIT_MAX = 12;
 const LOGIN_RATE_LIMIT_SECONDS = 900;
 const LOGIN_RATE_LIMIT_MAX = 8;
-const CONTACT_RATE_LIMIT_SECONDS = 3600;
-const CONTACT_RATE_LIMIT_MAX = 5;
 
 $configuredDataDir = getenv('CYRI_DATA_DIR');
 $dataDir = is_string($configuredDataDir) && trim($configuredDataDir) !== ''
@@ -27,11 +21,9 @@ $dataDir = is_string($configuredDataDir) && trim($configuredDataDir) !== ''
     : __DIR__ . DIRECTORY_SEPARATOR . 'data';
 $uploadsDir = $dataDir . DIRECTORY_SEPARATOR . 'uploads';
 $articlesFile = $dataDir . DIRECTORY_SEPARATOR . 'articles.json';
-$messagesFile = $dataDir . DIRECTORY_SEPARATOR . 'messages.json';
 $sessionsFile = $dataDir . DIRECTORY_SEPARATOR . 'sessions.json';
 $researchRateFile = $dataDir . DIRECTORY_SEPARATOR . 'research-rate-limits.json';
 $loginRateFile = $dataDir . DIRECTORY_SEPARATOR . 'login-rate-limits.json';
-$contactRateFile = $dataDir . DIRECTORY_SEPARATOR . 'contact-rate-limits.json';
 $staticArticlesFiles = [
     __DIR__ . DIRECTORY_SEPARATOR . 'content' . DIRECTORY_SEPARATOR . 'articles.json',
     __DIR__ . DIRECTORY_SEPARATOR . 'content' . DIRECTORY_SEPARATOR . 'articles-2026-expansion.json',
@@ -219,11 +211,6 @@ function clean_multiline_text($value, int $maxLength): string
     $text = str_replace("\r\n", "\n", (string) ($value ?? ''));
     $text = preg_replace("/\n{3,}/", "\n\n", trim($text));
     return truncate_text($text ?? '', $maxLength);
-}
-
-function without_unsafe_controls(string $value): string
-{
-    return preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $value) ?? '';
 }
 
 function normalize_translation_input(array $input): array
@@ -591,16 +578,6 @@ function enforce_login_rate_limit(string $rateFile): void
     );
 }
 
-function enforce_contact_rate_limit(string $rateFile): void
-{
-    enforce_rate_limit(
-        $rateFile,
-        CONTACT_RATE_LIMIT_MAX,
-        CONTACT_RATE_LIMIT_SECONDS,
-        'Too many messages sent. Try again later.'
-    );
-}
-
 function answer_research_with_openai(
     array $input,
     string $articlesFile,
@@ -768,15 +745,6 @@ function answer_research_with_openai(
         'answer' => $answer,
         'articles' => $referencedArticles,
     ];
-}
-
-function clean_email($value): string
-{
-    $email = strtolower(clean_text($value, 254));
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        fail(400, 'A valid email address is required.');
-    }
-    return $email;
 }
 
 function route_path(): string
@@ -1023,235 +991,6 @@ function save_uploaded_image(array $input, string $uploadsDir): array
     ];
 }
 
-function normalize_message(array $input): array
-{
-    $name = without_unsafe_controls(clean_text($input['name'] ?? '', 120));
-    $email = clean_email($input['email'] ?? '');
-    $message = without_unsafe_controls(clean_multiline_text($input['message'] ?? '', 5000));
-    $startedAt = $input['startedAt'] ?? null;
-    $nowMs = (int) floor(microtime(true) * 1000);
-
-    if (strlen($name) < 2 || strlen($message) < 10) {
-        fail(400, 'Name and a message of at least 10 characters are required.');
-    }
-
-    if (
-        !is_numeric($startedAt) ||
-        (int) $startedAt > $nowMs ||
-        $nowMs - (int) $startedAt < CONTACT_MIN_FORM_AGE_MS
-    ) {
-        fail(400, 'Please take a moment to complete the contact form.');
-    }
-
-    $createdAt = gmdate('c');
-    return [
-        'id' => bin2hex(random_bytes(16)),
-        'name' => $name,
-        'email' => $email,
-        'message' => $message,
-        'createdAt' => $createdAt,
-        'delivery' => [
-            'status' => 'pending',
-            'provider' => 'resend',
-            'updatedAt' => $createdAt,
-        ],
-    ];
-}
-
-function configured_email_address($value, string $label, bool $allowDisplayName = false): string
-{
-    $text = trim((string) ($value ?? ''));
-    if ($text === '' || strlen($text) > 320 || preg_match('/[\r\n]/', $text)) {
-        fail(503, $label . ' is not configured correctly.');
-    }
-
-    $plainMatched = preg_match(
-        '/^([^\s<>@]+@[^\s<>@]+\.[^\s<>@]+)$/u',
-        $text,
-        $plainMatches
-    );
-    $namedMatched = $allowDisplayName
-        ? preg_match(
-            '/^[^<>\r\n]{1,100}<([^\s<>@]+@[^\s<>@]+\.[^\s<>@]+)>$/u',
-            $text,
-            $namedMatches
-        )
-        : 0;
-    $address = $plainMatched === 1
-        ? ($plainMatches[1] ?? '')
-        : ($namedMatched === 1 ? ($namedMatches[1] ?? '') : '');
-
-    if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
-        fail(503, $label . ' is not configured correctly.');
-    }
-    return $text;
-}
-
-function contact_email_config(): array
-{
-    $apiKey = trim((string) getenv('RESEND_API_KEY'));
-    if ($apiKey === '' || strlen($apiKey) > 512 || preg_match('/[\r\n]/', $apiKey)) {
-        fail(503, 'Contact email delivery is not configured.');
-    }
-    if (!function_exists('curl_init')) {
-        fail(500, 'The PHP cURL extension is required for contact email delivery.');
-    }
-
-    $configuredUrl = trim((string) getenv('RESEND_API_URL'));
-    $apiUrl = $configuredUrl !== '' ? $configuredUrl : RESEND_EMAILS_URL;
-    $parsedUrl = parse_url($apiUrl);
-    $scheme = strtolower((string) ($parsedUrl['scheme'] ?? ''));
-    $host = strtolower((string) ($parsedUrl['host'] ?? ''));
-    $isLocalTestUrl =
-        strtolower(trim((string) getenv('CYRI_ENV'))) === 'test' &&
-        $scheme === 'http' &&
-        in_array($host, ['127.0.0.1', 'localhost', '::1'], true);
-    if ($scheme !== 'https' && !$isLocalTestUrl) {
-        fail(503, 'Contact email delivery must use HTTPS.');
-    }
-
-    return [
-        'apiKey' => $apiKey,
-        'apiUrl' => $apiUrl,
-        'from' => configured_email_address(
-            getenv('CYRI_CONTACT_FROM'),
-            'Contact sender address',
-            true
-        ),
-        'to' => configured_email_address(
-            getenv('CYRI_CONTACT_TO') ?: 'climateyri@gmail.com',
-            'Contact recipient address'
-        ),
-        'allowHttp' => $isLocalTestUrl,
-    ];
-}
-
-function contact_email_text(array $message): string
-{
-    return implode("\n", [
-        'New contact message from cyri.online',
-        '',
-        'Reference: ' . $message['id'],
-        'Received: ' . $message['createdAt'],
-        'Name: ' . $message['name'],
-        'Email: ' . $message['email'],
-        '',
-        'Message:',
-        $message['message'],
-        '',
-        'Reply to this email to answer the sender directly.',
-    ]);
-}
-
-function send_contact_email(array $message, array $config): array
-{
-    $requestBody = json_encode([
-        'from' => $config['from'],
-        'to' => [$config['to']],
-        'reply_to' => $message['email'],
-        'subject' => 'New contact message via cyri.online',
-        'text' => contact_email_text($message),
-        'tags' => [['name' => 'source', 'value' => 'website-contact']],
-    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-    if ($requestBody === false) {
-        return ['ok' => false];
-    }
-
-    $curl = curl_init($config['apiUrl']);
-    $curlOptions = [
-        CURLOPT_POST => true,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_CONNECTTIMEOUT => 10,
-        CURLOPT_TIMEOUT => 15,
-        CURLOPT_HTTPHEADER => [
-            'Authorization: Bearer ' . $config['apiKey'],
-            'Content-Type: application/json',
-            'Idempotency-Key: contact-' . $message['id'],
-            'User-Agent: CYRI-Website/1.0',
-        ],
-        CURLOPT_POSTFIELDS => $requestBody,
-    ];
-    if (!$config['allowHttp'] && defined('CURLOPT_PROTOCOLS') && defined('CURLPROTO_HTTPS')) {
-        $curlOptions[CURLOPT_PROTOCOLS] = CURLPROTO_HTTPS;
-    }
-    curl_setopt_array($curl, $curlOptions);
-    $rawResponse = curl_exec($curl);
-    $statusCode = (int) curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
-    $curlError = curl_errno($curl);
-    curl_close($curl);
-
-    if ($rawResponse === false || $curlError !== 0) {
-        return ['ok' => false];
-    }
-    $response = json_decode($rawResponse, true);
-    if (
-        $statusCode < 200 ||
-        $statusCode >= 300 ||
-        !is_array($response) ||
-        !is_string($response['id'] ?? null) ||
-        $response['id'] === ''
-    ) {
-        error_log('Contact email provider returned status ' . $statusCode . '.');
-        return ['ok' => false];
-    }
-
-    return ['ok' => true, 'id' => $response['id']];
-}
-
-function retained_contact_messages(array $messages, ?int $now = null): array
-{
-    $now = $now ?? time();
-    return array_values(array_filter($messages, function ($message) use ($now): bool {
-        if (!is_array($message)) {
-            return false;
-        }
-        $createdAt = strtotime((string) ($message['createdAt'] ?? ''));
-        return $createdAt !== false && $now - $createdAt <= CONTACT_RETENTION_SECONDS;
-    }));
-}
-
-function update_message_delivery(string $messagesFile, string $id, array $delivery): void
-{
-    mutate_json_file($messagesFile, function (array $messages) use ($id, $delivery): array {
-        $nextMessages = array_map(function ($message) use ($id, $delivery) {
-            if (is_array($message) && ($message['id'] ?? '') === $id) {
-                $message['delivery'] = $delivery;
-            }
-            return $message;
-        }, retained_contact_messages($messages));
-        return ['value' => $nextMessages, 'result' => true];
-    });
-}
-
-function enforce_same_site_request(): void
-{
-    $fetchSite = strtolower(trim((string) ($_SERVER['HTTP_SEC_FETCH_SITE'] ?? '')));
-    if (
-        $fetchSite !== '' &&
-        !in_array($fetchSite, ['same-origin', 'same-site', 'none'], true)
-    ) {
-        fail(403, 'Cross-site requests are not allowed.');
-    }
-
-    $origin = trim((string) ($_SERVER['HTTP_ORIGIN'] ?? ''));
-    if ($origin !== '') {
-        $originHost = parse_url($origin, PHP_URL_HOST);
-        $originPort = parse_url($origin, PHP_URL_PORT);
-        $originAuthority = is_string($originHost)
-            ? $originHost . (is_int($originPort) ? ':' . $originPort : '')
-            : '';
-        $requestHost = (string) ($_SERVER['HTTP_HOST'] ?? '');
-        if ($originAuthority === '' || !hash_equals($requestHost, $originAuthority)) {
-            fail(403, 'Cross-origin requests are not allowed.');
-        }
-    }
-
-    $contentType = strtolower((string) ($_SERVER['CONTENT_TYPE'] ?? ''));
-    if (strpos($contentType, 'application/json') !== 0) {
-        fail(415, 'Contact requests must use JSON.');
-    }
-}
-
 function sort_articles(array $articles): array
 {
     usort($articles, function ($a, $b) {
@@ -1363,45 +1102,6 @@ if ($route === '/research' && $method === 'POST') {
 if ($route === '/uploads' && $method === 'POST') {
     require_publish_session($sessionsFile);
     send_json(201, save_uploaded_image(read_request_json(), $uploadsDir));
-}
-
-if ($route === '/contact' && $method === 'POST') {
-    enforce_same_site_request();
-    $body = read_request_json(MAX_CONTACT_BODY_SIZE);
-    if (clean_text($body['website'] ?? '', 200) !== '') {
-        send_json(201, ['ok' => true]);
-    }
-    $emailConfig = contact_email_config();
-    enforce_contact_rate_limit($contactRateFile);
-    $message = normalize_message($body);
-    mutate_json_file(
-        $messagesFile,
-        function (array $messages) use ($message): array {
-            $messages = retained_contact_messages($messages);
-            array_unshift($messages, $message);
-            return [
-                'value' => $messages,
-                'result' => true,
-            ];
-        }
-    );
-
-    $delivery = send_contact_email($message, $emailConfig);
-    if (!($delivery['ok'] ?? false)) {
-        update_message_delivery($messagesFile, $message['id'], [
-            'status' => 'failed',
-            'provider' => 'resend',
-            'updatedAt' => gmdate('c'),
-        ]);
-        fail(502, 'Contact email delivery is temporarily unavailable.');
-    }
-    update_message_delivery($messagesFile, $message['id'], [
-        'status' => 'sent',
-        'provider' => 'resend',
-        'emailId' => $delivery['id'],
-        'updatedAt' => gmdate('c'),
-    ]);
-    send_json(201, ['ok' => true]);
 }
 
 fail(404, 'API route not found.');

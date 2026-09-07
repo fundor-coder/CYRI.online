@@ -19,8 +19,11 @@ Options -Indexes
   RewriteRule ^api/(.*)$ backend.php?route=/$1 [L,QSA]
   RewriteRule ^uploads/([a-f0-9]{32}\.jpg)$ backend.php?route=/uploads/$1 [L,QSA]
   RewriteRule ^(de|en)/?$ index.html [L]
-  RewriteRule ^de/(lernen|assistent|artikel(?:/[^/]+)?|ueber-uns|kontakt|publizieren|impressum|datenschutz)/?$ index.html [L]
-  RewriteRule ^en/(learn|assistant|articles(?:/[^/]+)?|about|contact|publish|imprint|privacy)/?$ index.html [L]
+  # Die Kontaktseite ist in "Ueber uns" aufgegangen; alte Links bleiben gueltig.
+  RewriteRule ^de/kontakt/?$ /de/ueber-uns [R=301,L]
+  RewriteRule ^en/contact/?$ /en/about [R=301,L]
+  RewriteRule ^de/(lernen|assistent|artikel(?:/[^/]+)?|ueber-uns|publizieren|impressum|datenschutz)/?$ index.html [L]
+  RewriteRule ^en/(learn|assistant|articles(?:/[^/]+)?|about|publish|imprint|privacy)/?$ index.html [L]
 </IfModule>
 
 <FilesMatch "(?i)\.(pdf|docx?|xlsx?|pptx?|odt|ods|odp|rtf|csv|zip|tar|gz|tgz|7z|rar|key|pem|p12|pfx|sqlite3?|db|log|bak|tmp|map)$">

@@ -14,9 +14,7 @@ Funding notice:
 Student info experience:
 - The `Explore` page puts interactive missions, models and environmental facts before passive reading.
 - Visitors can switch between oceans, climate ecosystems and climate-ready cities.
-- The home-page particle field can optionally follow the visitor through the front-facing camera.
-  Camera access starts only after a click; low-resolution frames are analysed in browser memory
-  and are never uploaded or stored. Mouse and trackpad control remain available as the fallback.
+- The home-page particle field follows the mouse or trackpad and drifts on its own when idle.
 - Mission, quiz and discovery choices are stored locally in the visitor's browser.
 - The Mission Lab lets visitors combine an environmental challenge, perspective and time frame into a live info model, animated impact cockpit, field kit, mini experiment, discussion prompt and action plan.
 - The SDG Lab turns all 17 Sustainable Development Goals into clickable student cards with short explanations, reflection questions and links into the map models.
@@ -41,15 +39,12 @@ Backend routes:
 - `POST backend.php?route=/research` answers questions using published CYRI articles as the only content basis.
 - `POST backend.php?route=/uploads` stores an optimized custom article photo in `data/uploads`.
 - `POST backend.php?route=/articles` stores a new article immediately or with a future `publishAt` time.
-- `POST backend.php?route=/contact` validates and rate-limits contact messages, stores a
-  recoverable copy in `data/messages.json` and sends a plain-text email to the configured
-  CYRI inbox.
 - `/api/...` paths also work on Node and through the root Apache rewrite.
 
 Deployment:
 - Node hosting: upload the full folder, run `npm start`, and point the domain to the Node app. Set `CYRI_DATA_DIR` to a persistent server directory when the host uses ephemeral deployments.
 - PHP/Apache hosting: upload the full folder. The backend logic is in one file, `backend.php`. Make sure the `data` folder is writable; runtime JSON files are created automatically. `CYRI_DATA_DIR` can point to storage outside the deployment folder.
-- Static-only hosting is not enough for publishing, contact messages or AI answers, because those features need the backend.
+- Static-only hosting is not enough for publishing or AI answers, because those features need the backend.
 - GitHub Pages can display the frontend, but it cannot run the CYRI assistant or store published articles. Use the Node/Docker or PHP deployment as the production website when these functions must work.
 
 Private-file protection:
@@ -85,22 +80,9 @@ AI translation:
 - The default model is `gpt-5.4-mini`. Override it with `OPENAI_TRANSLATION_MODEL` if needed.
 - Translation requests are sent only from the Node or PHP backend. Review every translation before publishing.
 
-Contact email delivery:
-- Create a Resend account, add and verify the sending subdomain `send.cyri.online`, and add the
-  SPF and DKIM records shown by Resend to the domain DNS.
-- Copy `.env.example` to `.env` on the server. Set `RESEND_API_KEY` to a sending-only API key,
-  `CYRI_CONTACT_FROM` to an address on the verified domain and `CYRI_CONTACT_TO` to
-  `climateyri@gmail.com`.
-- Never place the API key in `app.js`, `index.html`, a public hosting dashboard field or Git.
-- The visitor's validated address is used only as `Reply-To`; the fixed verified CYRI address is
-  always used as the sender to protect deliverability and prevent mail-header injection.
-- Contact requests are limited to 16 KB and five accepted attempts per IP per hour. The persistent
-  rate-limit file contains only a one-way hash of the client address. A honeypot, minimum
-  completion time and same-site browser check reject common automated abuse.
-- Messages are stored with delivery status for recovery and automatically removed after roughly
-  six months when a later contact request performs retention cleanup.
-- Set `CYRI_TRUST_PROXY=true` only behind a trusted reverse proxy that overwrites
-  `X-Forwarded-For`. Otherwise leave it `false` so visitors cannot spoof the rate-limit address.
+Contact:
+- The website has no contact form. Visitors write to `climateyri@gmail.com`, shown on the
+  About page and in the footer, so no message data is processed by the site at all.
 
 CYRI assistant:
 - Set `OPENAI_API_KEY` in the server environment. The key stays in the Node or PHP backend and is never sent to visitors.
@@ -115,7 +97,7 @@ Docker / Node server:
 - Run it with `docker run -d --name cyri -p 5173:5173 -v cyri-data:/app/data --env-file .env cyri-website`.
 - Publishing stays disabled until `CYRI_PUBLISH_PASSWORD` or a SHA-256 `CYRI_PUBLISH_PASSWORD_HASH` is configured. Never commit the production secret.
 - Or use `docker compose up -d --build`; `compose.yaml` automatically mounts the named `cyri-data` volume.
-- Open `http://localhost:5173/`. Published articles, uploaded photos and contact messages are stored in the `cyri-data` volume.
+- Open `http://localhost:5173/`. Published articles and uploaded photos are stored in the `cyri-data` volume.
 - Do not delete the `cyri-data` volume during updates. `docker compose down` keeps it; `docker compose down -v` deletes it.
 
 Persistent storage:

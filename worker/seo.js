@@ -69,15 +69,6 @@ export const SEO_ROUTES = [
     },
   },
   {
-    page: "contact",
-    paths: { de: "/de/kontakt", en: "/en/contact" },
-    titles: { de: "Kontakt | CYRI Umweltbildung", en: "Contact | CYRI Environmental Education" },
-    descriptions: {
-      de: "Kontaktiere CYRI für Umweltbildungsprojekte, Medienanfragen, Artikelhinweise und Kooperationen.",
-      en: "Contact CYRI about environmental education projects, media inquiries, article feedback and partnerships.",
-    },
-  },
-  {
     page: "imprint",
     paths: { de: "/de/impressum", en: "/en/imprint" },
     titles: { de: "Impressum | CYRI", en: "Imprint | CYRI" },
@@ -106,6 +97,18 @@ export const SEO_ROUTES = [
     noindex: true,
   },
 ];
+
+export const MERGED_CONTACT_PATHS = {
+  "/de/kontakt": "/de/ueber-uns",
+  "/en/contact": "/en/about",
+};
+
+// Die Kontaktseite ist in "Ueber uns" aufgegangen; alte Links und Suchtreffer
+// sollen dort landen statt auf einer 404.
+export function mergedContactTarget(pathname) {
+  const normalized = pathname.replace(/\/+$/, "") || "/";
+  return MERGED_CONTACT_PATHS[normalized] || null;
+}
 
 export function seoRouteForPath(pathname) {
   if (pathname === "/") {

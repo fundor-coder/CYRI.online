@@ -531,57 +531,6 @@ h3 {
   gap: 12px;
 }
 
-.button-camera {
-  gap: 9px;
-  border-color: rgba(22, 131, 95, 0.2);
-  background: rgba(231, 246, 241, 0.72);
-  color: var(--ink);
-  backdrop-filter: blur(18px) saturate(150%);
-  -webkit-backdrop-filter: blur(18px) saturate(150%);
-}
-
-.button-camera:hover {
-  border-color: rgba(22, 131, 95, 0.38);
-  background: rgba(231, 246, 241, 0.94);
-}
-
-.button-camera[aria-pressed="true"] {
-  border-color: rgba(22, 131, 95, 0.48);
-  background: rgba(22, 131, 95, 0.12);
-  color: #0c6248;
-}
-
-.camera-indicator {
-  width: 9px;
-  height: 9px;
-  flex: 0 0 auto;
-  border-radius: 50%;
-  background: currentColor;
-  box-shadow: 0 0 0 4px rgba(22, 131, 95, 0.1);
-  opacity: 0.48;
-}
-
-.button-camera[aria-pressed="true"] .camera-indicator {
-  animation: camera-tracking-pulse 1.8s ease-in-out infinite;
-  opacity: 1;
-}
-
-.camera-tracking-status {
-  min-height: 1.35em;
-  max-width: 620px;
-  margin: 12px 0 0;
-  color: var(--muted);
-  font-size: 0.78rem;
-  line-height: 1.45;
-}
-
-@keyframes camera-tracking-pulse {
-  50% {
-    box-shadow: 0 0 0 7px rgba(22, 131, 95, 0.04);
-    opacity: 0.72;
-  }
-}
-
 .button {
   --specular-angle: 135deg;
   --specular-brightness: 0;
@@ -4068,7 +4017,6 @@ h3 {
 .focus-card,
 .article-card,
 .team-card,
-.contact-form,
 .contact-panel,
 .legal-card {
   overflow: hidden;
@@ -4621,13 +4569,6 @@ h3 {
     inset 0 1px 0 rgba(255, 255, 255, 0.92);
 }
 
-.contact-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(330px, 0.62fr);
-  gap: 24px;
-  align-items: start;
-}
-
 .research-tool {
   position: relative;
   display: grid;
@@ -4687,16 +4628,12 @@ h3 {
 }
 
 .research-form textarea,
-.contact-form input,
-.contact-form textarea,
 .publish-form input,
 .publish-form select,
 .publish-form textarea,
 .publish-gate input {
   border-radius: var(--radius-sm);
 }
-
-.contact-form input,
 .publish-form input,
 .publish-form select,
 .publish-gate input {
@@ -4839,22 +4776,16 @@ h3 {
   vertical-align: bottom;
   white-space: nowrap;
 }
-
-.contact-form,
 .contact-panel,
 .publish-card,
 .publish-panel {
   padding: 32px;
 }
-
-.contact-form,
 .publish-form,
 .publish-gate {
   display: grid;
   gap: 18px;
 }
-
-.contact-form label,
 .publish-form label,
 .publish-gate label {
   display: grid;
@@ -4862,9 +4793,6 @@ h3 {
   color: var(--ink-soft);
   font-weight: 680;
 }
-
-.contact-form input,
-.contact-form textarea,
 .publish-form input,
 .publish-form select,
 .publish-form textarea,
@@ -4883,9 +4811,6 @@ h3 {
   -webkit-backdrop-filter: blur(14px);
   transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
-
-.contact-form input:focus,
-.contact-form textarea:focus,
 .publish-form input:focus,
 .publish-form select:focus,
 .publish-form textarea:focus,
@@ -4896,8 +4821,6 @@ h3 {
     0 0 0 4px rgba(39, 116, 216, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.96);
 }
-
-.contact-form textarea,
 .publish-form textarea {
   resize: vertical;
 }
@@ -5509,7 +5432,6 @@ h3 {
   .focus-card,
   .article-card,
   .team-card,
-  .contact-form,
   .contact-panel,
   .research-tool,
   .legal-card,
@@ -5634,7 +5556,6 @@ body[data-audience="children"] .modal-body h3 {
 .focus-card,
 .article-card,
 .team-card,
-.contact-form,
 .contact-panel,
 .research-tool,
 .legal-card,
@@ -5776,7 +5697,6 @@ body[data-audience="children"] .modal-body h3 {
   .hero-inner,
   .mission-layout,
   .about-layout,
-  .contact-layout,
   .publish-layout,
   .research-tool,
   .quiz-layout,
@@ -7199,20 +7119,6 @@ button.certificate-preview.is-selected {
   margin-top: 2px;
 }
 
-.form-honeypot {
-  position: absolute !important;
-  left: -10000px !important;
-  width: 1px !important;
-  height: 1px !important;
-  overflow: hidden !important;
-}
-
-.form-privacy {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.84rem;
-}
-
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
@@ -7366,8 +7272,6 @@ select:focus-visible {
   .article-photo {
     margin: -20px -20px 18px;
   }
-
-  .contact-form,
   .contact-panel,
   .publish-card,
   .publish-panel,

@@ -1708,7 +1708,6 @@ const routePaths = {
     research: "/en/assistant",
     articles: "/en/articles",
     about: "/en/about",
-    contact: "/en/contact",
     publish: "/en/publish",
     imprint: "/en/imprint",
     privacy: "/en/privacy",
@@ -1719,7 +1718,6 @@ const routePaths = {
     research: "/de/assistent",
     articles: "/de/artikel",
     about: "/de/ueber-uns",
-    contact: "/de/kontakt",
     publish: "/de/publizieren",
     imprint: "/de/impressum",
     privacy: "/de/datenschutz",
@@ -1820,12 +1818,7 @@ const content = {
         privacy: {
           title: "Privacy | CYRI",
           description:
-            "Privacy notice for the CYRI website backend and contact forms.",
-        },
-        contact: {
-          title: "Contact | CYRI",
-          description:
-            "Contact CYRI for questions, media inquiries, article feedback and general messages.",
+            "Privacy notice for the CYRI website backend and publishing area.",
         },
       },
     },
@@ -1845,7 +1838,6 @@ const content = {
       learningArticles: "Info articles",
       about: "About",
       publish: "Publish",
-      contact: "Contact",
     },
     audience: {
       gateEyebrow: "Choose your view",
@@ -2299,25 +2291,9 @@ const content = {
     },
     contact: {
       eyebrow: "Contact",
-      title: "Contact CYRI.",
-      intro:
-        "Reach out with questions, media inquiries, article feedback or general messages.",
-      name: "Name",
-      namePlaceholder: "Your name",
-      email: "Email",
-      emailPlaceholder: "your.email@example.com",
-      message: "Message",
-      messagePlaceholder: "Tell us what your message is about.",
-      privacyNote: "We use your details only to answer your message. Details are in the privacy notice.",
-      submit: "Send Message",
-      success: "Thank you. Your message was securely sent to the CYRI team by email.",
-      error: "The message could not be delivered. Please email climateyri@gmail.com directly.",
-      rateLimited: "Too many messages were sent from this connection. Please try again later.",
-      unavailable: "Email delivery is currently unavailable. Please email climateyri@gmail.com directly.",
-      panelEyebrow: "Contact",
       panelTitle: "Questions and article feedback.",
       panelText:
-        "CYRI reads messages related to articles, climate topics, media questions and general feedback.",
+        "Write to CYRI about articles, climate topics, media questions and general feedback. Messages go straight to the address below.",
     },
     publish: {
       eyebrow: "Publish",
@@ -2425,15 +2401,13 @@ const content = {
       localStorageTitle: "Data on this device",
       localStorageText:
         "Language, game progress, badges and selected settings are stored locally in the browser. They are not a public profile and can be deleted through the browser settings.",
-      cameraTitle: "Optional camera tracking",
-      cameraText:
-        "Camera tracking starts only after you press the camera button and grant browser permission. Frames are analysed locally in volatile browser memory to control the particle animation; no camera image is stored or sent to CYRI or third parties. You can stop access with the same button or through your browser settings.",
       rightsTitle: "Your rights",
       rightsText:
         "You may request access, correction, deletion, restriction, portability or object to processing. You may withdraw consent at any time and lodge a complaint with a data-protection authority.",
     },
     footer: {
       statement: "Youth-led environmental education for a more sustainable future.",
+      contact: "Contact",
       language: "Language",
       social: "Social",
       imprint: "Imprint",
@@ -2500,11 +2474,6 @@ const content = {
           description:
             "Datenschutzhinweise für das CYRI-Website-Backend und Kontaktformulare.",
         },
-        contact: {
-          title: "Kontakt | CYRI",
-          description:
-            "Kontaktiere CYRI für Fragen, Medienanfragen, Artikelhinweise und allgemeine Nachrichten.",
-        },
       },
     },
     nav: {
@@ -2523,7 +2492,6 @@ const content = {
       learningArticles: "Infoartikel",
       about: "Über uns",
       publish: "Publizieren",
-      contact: "Kontakt",
     },
     audience: {
       gateEyebrow: "Ansicht wählen",
@@ -2978,25 +2946,9 @@ const content = {
     },
     contact: {
       eyebrow: "Kontakt",
-      title: "CYRI kontaktieren.",
-      intro:
-        "Melde dich mit Fragen, Medienanfragen, Artikelhinweisen oder allgemeinen Nachrichten.",
-      name: "Name",
-      namePlaceholder: "Dein Name",
-      email: "E-Mail",
-      emailPlaceholder: "deine.email@example.com",
-      message: "Nachricht",
-      messagePlaceholder: "Beschreibe, worum es in deiner Nachricht geht.",
-      privacyNote: "Wir verwenden deine Angaben nur zur Beantwortung der Nachricht. Details stehen im Datenschutzhinweis.",
-      submit: "Nachricht senden",
-      success: "Danke. Deine Nachricht wurde sicher per E-Mail an das CYRI-Team gesendet.",
-      error: "Die Nachricht konnte nicht zugestellt werden. Bitte schreibe direkt an climateyri@gmail.com.",
-      rateLimited: "Über diese Verbindung wurden zu viele Nachrichten gesendet. Bitte versuche es später erneut.",
-      unavailable: "Der E-Mail-Versand ist derzeit nicht verfügbar. Bitte schreibe direkt an climateyri@gmail.com.",
-      panelEyebrow: "Kontakt",
       panelTitle: "Fragen und Artikelhinweise.",
       panelText:
-        "CYRI liest Nachrichten zu Artikeln, Klimathemen, Medienfragen und allgemeinem Feedback.",
+        "Schreib CYRI zu Artikeln, Klimathemen, Medienfragen und allgemeinem Feedback. Nachrichten gehen direkt an die Adresse unten.",
     },
     publish: {
       eyebrow: "Publizieren",
@@ -3104,15 +3056,13 @@ const content = {
       localStorageTitle: "Daten auf diesem Gerät",
       localStorageText:
         "Sprache, Spielfortschritt, Badges und ausgewählte Einstellungen werden lokal im Browser gespeichert. Sie bilden kein öffentliches Profil und können über die Browser-Einstellungen gelöscht werden.",
-      cameraTitle: "Optionales Kamera-Tracking",
-      cameraText:
-        "Das Kamera-Tracking startet erst, nachdem du den Kamera-Button gedrückt und die Browser-Berechtigung erteilt hast. Einzelbilder werden ausschließlich lokal im flüchtigen Arbeitsspeicher des Browsers ausgewertet, um die Partikelanimation zu steuern; es wird kein Kamerabild gespeichert oder an CYRI oder Dritte gesendet. Du kannst den Zugriff über denselben Button oder in den Browser-Einstellungen beenden.",
       rightsTitle: "Deine Rechte",
       rightsText:
         "Du kannst Auskunft, Berichtigung, Löschung, Einschränkung oder Datenübertragbarkeit verlangen und der Verarbeitung widersprechen. Eine Einwilligung kann jederzeit widerrufen und eine Datenschutzaufsichtsbehörde kontaktiert werden.",
     },
     footer: {
       statement: "Jugendgeführte Umweltbildung für eine nachhaltigere Zukunft.",
+      contact: "Kontakt",
       language: "Sprache",
       social: "Social Media",
       imprint: "Impressum",
@@ -3380,7 +3330,6 @@ const routes = new Set([
   "research",
   "about",
   "publish",
-  "contact",
   "imprint",
   "privacy",
 ]);
@@ -8009,54 +7958,6 @@ document.querySelector("[data-research-form]").addEventListener("submit", async 
   } finally {
     submitButton.disabled = false;
     submitButton.textContent = t("research.submit");
-  }
-});
-
-const contactForm = document.querySelector("[data-contact-form]");
-const contactStartedAt = contactForm.querySelector("input[name='startedAt']");
-
-function resetContactFormTimer() {
-  contactStartedAt.value = String(Date.now());
-}
-
-resetContactFormTimer();
-
-contactForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const form = event.currentTarget;
-  const submitButton = form.querySelector("button[type='submit']");
-  const status = document.querySelector("[data-form-status]");
-  const data = new FormData(form);
-
-  submitButton.disabled = true;
-  status.textContent = "";
-  status.dataset.state = "";
-
-  try {
-    await apiRequest("/contact", {
-      method: "POST",
-      body: {
-        name: String(data.get("name") || ""),
-        email: String(data.get("email") || ""),
-        message: String(data.get("message") || ""),
-        website: String(data.get("website") || ""),
-        startedAt: Number(data.get("startedAt") || 0),
-      },
-    });
-    form.reset();
-    resetContactFormTimer();
-    status.textContent = t("contact.success");
-    status.dataset.state = "success";
-  } catch (error) {
-    status.textContent =
-      error.status === 429
-        ? t("contact.rateLimited")
-        : error.status === 503
-          ? t("contact.unavailable")
-          : t("contact.error");
-    status.dataset.state = "error";
-  } finally {
-    submitButton.disabled = false;
   }
 });
 

@@ -4,7 +4,6 @@
 // provides Web Crypto instead, so the equivalents live here.
 
 export const MAX_JSON_BODY_SIZE = 4 * 1024 * 1024;
-export const MAX_CONTACT_BODY_SIZE = 16 * 1024;
 
 export class HttpError extends Error {
   constructor(statusCode, message) {
@@ -50,7 +49,7 @@ export function securityHeaders() {
   return {
     "Content-Security-Policy":
       "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob:; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'",
-    "Permissions-Policy": "camera=(self), geolocation=(), microphone=(), payment=(), usb=()",
+    "Permissions-Policy": "camera=(), geolocation=(), microphone=(), payment=(), usb=()",
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
     "X-Content-Type-Options": "nosniff",
@@ -111,23 +110,6 @@ export function cleanMultilineText(value, maxLength) {
     .replace(/\n{3,}/g, "\n\n")
     .trim();
   return text.slice(0, maxLength);
-}
-
-const UNSAFE_CONTROL_PATTERN = new RegExp(
-  "[\\u0000-\\u0008\\u000b\\u000c\\u000e-\\u001f\\u007f]",
-  "g"
-);
-
-export function withoutUnsafeControls(value) {
-  return String(value).replace(UNSAFE_CONTROL_PATTERN, "");
-}
-
-export function cleanEmail(value) {
-  const email = cleanText(value, 254).toLowerCase();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    throw createError(400, "A valid email address is required.");
-  }
-  return email;
 }
 
 export function clientAddress(request) {

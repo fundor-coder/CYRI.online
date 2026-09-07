@@ -5,14 +5,12 @@
 // namespace (binding CYRI_DATA):
 //
 //   articles                  editor-created articles (JSON array)
-//   message:<id>              one contact message, expires after the retention window
 //   ratelimit:<scope>:<hash>  request timestamps for one client, expires with the window
 //   upload:<file>.jpg         uploaded cover image bytes
 
 import { clientAddress, createError, sha256 } from "./util.js";
 
 const ARTICLES_KEY = "articles";
-const CONTACT_RETENTION_SECONDS = 60 * 60 * 24 * 183;
 const MIN_KV_TTL_SECONDS = 60;
 
 export async function readArticles(env) {
@@ -22,21 +20,6 @@ export async function readArticles(env) {
 
 export async function writeArticles(env, articles) {
   await env.CYRI_DATA.put(ARTICLES_KEY, JSON.stringify(articles));
-}
-
-export async function saveMessage(env, message) {
-  await env.CYRI_DATA.put(`message:${message.id}`, JSON.stringify(message), {
-    expirationTtl: CONTACT_RETENTION_SECONDS,
-  });
-}
-
-export async function updateMessageDelivery(env, id, delivery) {
-  const key = `message:${id}`;
-  const stored = await env.CYRI_DATA.get(key, "json");
-  if (!stored) return;
-  await env.CYRI_DATA.put(key, JSON.stringify({ ...stored, delivery }), {
-    expirationTtl: CONTACT_RETENTION_SECONDS,
-  });
 }
 
 export async function enforceRateLimit(env, request, scope, windowMs, maximum, message) {

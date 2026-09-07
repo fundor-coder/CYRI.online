@@ -15,15 +15,12 @@ import {
   timingSafeHexCompare,
   sha256,
   randomHex,
-  MAX_CONTACT_BODY_SIZE,
 } from "./util.js";
 import {
   enforceRateLimit,
   getUpload,
   putUpload,
   readArticles,
-  saveMessage,
-  updateMessageDelivery,
   writeArticles,
 } from "./store.js";
 import {
@@ -34,20 +31,18 @@ import {
 import { createPublishSession, currentPublishPasswordHash, requirePublishSession } from "./session.js";
 import { answerResearchQuestion, translateArticle } from "./openai.js";
 import {
-  contactEmailConfig,
-  enforceSameSiteRequest,
-  normalizeMessage,
-  sendContactEmail,
-} from "./contact.js";
-import { renderSeoHtml, seoRouteForPath, articleRouteForPath, sitemapXml } from "./seo.js";
+  renderSeoHtml,
+  seoRouteForPath,
+  articleRouteForPath,
+  mergedContactTarget,
+  sitemapXml,
+} from "./seo.js";
 
 const MAX_UPLOAD_SIZE = 2.5 * 1024 * 1024;
 const RESEARCH_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RESEARCH_RATE_LIMIT_MAX = 12;
 const AUTH_RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
 const AUTH_RATE_LIMIT_MAX = 8;
-const CONTACT_RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
-const CONTACT_RATE_LIMIT_MAX = 5;
 
 // backend.php?route=/x is the Apache entry point; app.js still tries it first.
 function normalizeApiPath(url) {
@@ -179,54 +174,6 @@ async function handleApi(request, env, url) {
     return jsonResponse(201, await saveUploadedImage(env, body));
   }
 
-  if (url.pathname === "/api/contact" && request.method === "POST") {
-    enforceSameSiteRequest(request);
-    const body = await readRequestJson(request, MAX_CONTACT_BODY_SIZE);
-    if (cleanText(body.website, 200)) {
-      return jsonResponse(201, { ok: true });
-    }
-    const emailConfig = contactEmailConfig(env);
-    await enforceRateLimit(
-      env,
-      request,
-      "contact",
-      CONTACT_RATE_LIMIT_WINDOW_MS,
-      CONTACT_RATE_LIMIT_MAX,
-      "Too many contact messages. Try again later."
-    );
-    const message = normalizeMessage(body);
-    await saveMessage(env, message);
-
-    let emailId;
-    try {
-      emailId = await sendContactEmail(message, emailConfig);
-    } catch (error) {
-      try {
-        await updateMessageDelivery(env, message.id, {
-          status: "failed",
-          provider: "resend",
-          updatedAt: new Date().toISOString(),
-        });
-      } catch {
-        console.error("Contact message delivery status could not be stored.");
-      }
-      throw error;
-    }
-
-    try {
-      await updateMessageDelivery(env, message.id, {
-        status: "sent",
-        provider: "resend",
-        emailId,
-        updatedAt: new Date().toISOString(),
-      });
-    } catch {
-      console.error("Sent contact message delivery status could not be stored.");
-    }
-
-    return jsonResponse(201, { ok: true });
-  }
-
   return jsonResponse(404, { error: "API route not found." });
 }
 
@@ -250,6 +197,11 @@ async function handleStatic(request, env, url) {
   }
   if (requestPath.includes("\0") || requestPath.includes("\\") || requestPath.includes("..")) {
     throw createError(404, "Not found.");
+  }
+
+  const mergedTarget = mergedContactTarget(requestPath);
+  if (mergedTarget) {
+    return Response.redirect(new URL(mergedTarget, url.origin).toString(), 301);
   }
 
   if (requestPath === "/sitemap.xml") {

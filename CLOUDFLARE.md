@@ -9,7 +9,6 @@ gleiche Fehlermeldungen — nur der Speicher ist ein anderer.
 | Statische Dateien | Apache / `server.js` | Asset-Store (Inhalt von `dist/`) |
 | API | `backend.php`, `server.js` | `worker/index.js` |
 | Artikel | `data/articles.json` | KV-Key `articles` |
-| Kontaktnachrichten | `data/messages.json` | KV-Keys `message:<id>`, laufen nach 183 Tagen ab |
 | Rate-Limits | Datei + Arbeitsspeicher | KV-Keys `ratelimit:<bereich>:<hash>` |
 | Bild-Uploads | `data/uploads/` | KV-Keys `upload:<datei>.jpg` |
 | Login-Sitzungen | Map im Prozess | signierte HMAC-Tokens (kein Serverspeicher) |
@@ -46,13 +45,12 @@ landen dadurch gar nicht erst im Deployment. Neue öffentliche Dateien müssen i
 
 ## Secrets
 
-Ohne Secrets läuft die Website normal; Kontaktformular, KI-Assistent und
-Publizieren melden `503 … is not configured` — genau wie beim alten Backend.
+Ohne Secrets läuft die Website normal; KI-Assistent und Publizieren melden
+`503 … is not configured` — genau wie beim alten Backend.
 
 ```bash
 wrangler secret put CYRI_PUBLISH_PASSWORD_HASH   # sha256-Hash des Publizieren-Passworts
 wrangler secret put OPENAI_API_KEY               # Übersetzung + Assistent
-wrangler secret put RESEND_API_KEY               # Kontaktformular
 wrangler secret put CYRI_SESSION_SECRET          # optional, sonst wird der Passwort-Hash verwendet
 ```
 
