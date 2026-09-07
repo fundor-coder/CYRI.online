@@ -2199,7 +2199,7 @@ const content = {
         {
           status: "On our channels",
           title: "Social explainers",
-          text: "Compact educational posts for Instagram, LinkedIn and X.",
+          text: "Compact educational posts for Instagram.",
         },
       ],
       quizEyebrow: "Knowledge check",
@@ -2854,7 +2854,7 @@ const content = {
         {
           status: "Auf unseren Kanälen",
           title: "Social Erklärformate",
-          text: "Kompakte Bildungsbeiträge für Instagram, LinkedIn und X.",
+          text: "Kompakte Bildungsbeiträge für Instagram.",
         },
       ],
       quizEyebrow: "Wissenscheck",
@@ -4170,8 +4170,6 @@ function updateStructuredData(article, pageUrl, pageTitle, pageDescription, soci
       ],
       sameAs: [
         "https://www.instagram.com/cyri.de/",
-        "https://www.linkedin.com/company/cyri/",
-        "https://x.com/ClimateYRI",
       ],
     },
     {

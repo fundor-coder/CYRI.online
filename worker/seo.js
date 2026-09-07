@@ -174,8 +174,6 @@ function structuredDataForSeo({ route, article, canonicalUrl, title, description
       ],
       sameAs: [
         "https://www.instagram.com/cyri.de/",
-        "https://www.linkedin.com/company/cyri/",
-        "https://x.com/ClimateYRI",
       ],
     },
     {
