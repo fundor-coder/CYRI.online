@@ -6638,7 +6638,7 @@ function renderArticleCard(article, featured = false) {
       <div class="article-meta">
         <span class="article-category">${escapeHtml(category[state.lang])}</span>
         <span aria-hidden="true">-</span>
-        <time datetime="${article.date}">${formatDate(article.date)}</time>
+        <time datetime="${escapeHtml(article.date)}">${escapeHtml(formatDate(article.date))}</time>
       </div>
       <h3>${escapeHtml(presentation.title)}</h3>
       <p>${escapeHtml(presentation.summary)}</p>
