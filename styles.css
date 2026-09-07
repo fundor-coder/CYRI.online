@@ -2407,77 +2407,179 @@ h3 {
   align-items: stretch;
 }
 
-.game-flow-panel {
-  grid-column: 1 / -1;
+.game-medal-select {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.32fr);
-  gap: 18px;
-  align-items: stretch;
-  border: 1px solid var(--glass-edge);
-  border-radius: var(--game-radius-xl);
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.84), rgba(238, 247, 244, 0.5)),
-    rgba(255, 255, 255, 0.52);
-  box-shadow: var(--glass-shadow);
-  padding: 22px;
+  gap: 8px;
 }
 
-.game-time-row {
+.game-medal-row {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 8px;
 }
 
-.game-time-button {
+/* Die Pfade heissen nach ihrer Medaille; wie lange sie dauern steht unter dem
+   Spielbereich, damit die Auswahl nicht nach Zeitdruck aussieht. */
+.game-medal-button {
   display: grid;
-  gap: 5px;
-  min-height: 82px;
+  justify-items: center;
+  gap: 6px;
   border: 1px solid rgba(18, 22, 29, 0.08);
   border-radius: var(--game-radius-md);
   background: rgba(255, 255, 255, 0.72);
-  color: var(--ink);
+  color: var(--ink-soft);
   cursor: pointer;
-  padding: 14px 16px;
-  text-align: left;
-  transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+  padding: 12px 6px 10px;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
 }
 
-.game-time-button:hover,
-.game-time-button.is-active {
+.game-medal-button strong {
+  font-size: 0.82rem;
+  font-weight: 620;
+}
+
+.game-medal-disc {
+  display: block;
+  width: 30px;
+  height: 30px;
+  border: 2px solid color-mix(in srgb, var(--medal-color) 72%, #ffffff);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 30%, #ffffff 0%, var(--medal-light) 38%, var(--medal-color) 100%);
+  box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.16);
+  opacity: 0.55;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.game-medal-button:hover,
+.game-medal-button.is-active {
   transform: translateY(-1px);
-  border-color: rgba(22, 131, 95, 0.28);
-  background: rgba(255, 255, 255, 0.94);
+  border-color: color-mix(in srgb, var(--medal-color) 46%, transparent);
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--ink);
   box-shadow: 0 12px 26px rgba(27, 48, 65, 0.09);
 }
 
-.game-time-button strong {
-  color: var(--green);
-  font-size: 1.04rem;
+.game-medal-button.is-active .game-medal-disc,
+.game-medal-button:hover .game-medal-disc {
+  opacity: 1;
 }
 
-.game-time-button span {
+.game-medal-button.is-active .game-medal-disc {
+  transform: scale(1.06);
+}
+
+/* Ein bereits geschaffter Pfad bekommt einen Ring, damit der Fortschritt sichtbar bleibt. */
+.game-medal-button.is-earned .game-medal-disc {
+  opacity: 1;
+  box-shadow:
+    inset 0 -2px 4px rgba(0, 0, 0, 0.16),
+    0 0 0 3px color-mix(in srgb, var(--medal-color) 28%, transparent);
+}
+
+.game-tab-list {
+  display: grid;
+  gap: 10px;
+}
+
+.game-medal-note {
   color: var(--muted);
-  font-size: 0.82rem;
+  font-size: 0.84rem;
+}
+
+/* Rueckmeldung im SDG-Sprint: eigene Wahl und passendes Ziel nebeneinander. */
+.sprint-outcome {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.sprint-outcome-card {
+  display: grid;
+  gap: 3px;
+  border-left: 4px solid var(--game-color);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 9px 12px;
+  animation: sprint-outcome-in 260ms ease-out both;
+}
+
+.sprint-outcome-card span {
+  color: var(--muted);
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sprint-outcome-card strong {
+  font-size: 0.92rem;
   line-height: 1.3;
+}
+
+.sprint-outcome-fact {
+  margin: 10px 0 0;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.sprint-outcome-fact em {
+  display: block;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-style: normal;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+@keyframes sprint-outcome-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* Das gerade gesetzte Kettenglied faehrt ein, damit der eigene Zug sichtbar ist. */
+.chain-step.is-new {
+  animation: chain-step-in 340ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes chain-step-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sprint-outcome-card,
+  .chain-step.is-new,
+  .council-speak-mark {
+    animation: none;
+  }
 }
 
 .game-path-status {
   display: grid;
   align-content: center;
-  gap: 6px;
+  gap: 4px;
   border-radius: var(--game-radius-lg);
   background: rgba(39, 116, 216, 0.09);
-  padding: 18px;
+  padding: 12px 14px;
 }
 
 .game-path-status strong {
   color: var(--blue);
-  font-size: 1rem;
+  font-size: 0.94rem;
 }
 
 .game-path-status span {
   color: var(--ink-soft);
-  font-size: 0.9rem;
+  font-size: 0.84rem;
   line-height: 1.35;
 }
 
@@ -4350,12 +4452,11 @@ h3 {
 
 .learn-games-hero {
   display: grid;
-  /* Auf die kleinere Ueberschrift abgestimmt, damit kein leerer Block entsteht. */
-  min-height: clamp(180px, 22vw, 280px);
+  min-height: clamp(300px, 42vw, 520px);
   place-items: center;
   overflow: hidden;
-  padding-top: clamp(64px, 7vw, 96px);
-  padding-bottom: clamp(40px, 5vw, 64px);
+  padding-top: clamp(80px, 10vw, 122px);
+  padding-bottom: clamp(70px, 9vw, 112px);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(247, 251, 250, 0.5)),
     linear-gradient(125deg, rgba(39, 116, 216, 0.12), rgba(22, 131, 95, 0.1), rgba(246, 205, 92, 0.1));
@@ -4376,25 +4477,51 @@ h3 {
   max-width: none;
   margin: 0;
   border: 0;
-  border-radius: 0.18em;
-  background: none;
-  color: var(--ink);
+  border-radius: 0.22em;
+  padding: 0.1em 0.12em 0.16em;
+  color: #c8c9d1;
+  background:
+    linear-gradient(
+      104deg,
+      #696b78 0%,
+      #f7f8fb 8%,
+      #b6b8c2 17%,
+      #fdfdff 27%,
+      #b8bac4 42%,
+      #e8e9ee 57%,
+      #a5a7b2 73%,
+      #f8f9fb 87%,
+      #858793 100%
+    );
+  background-clip: text;
   cursor: pointer;
-  filter: none;
-  font-family: "SF Pro Rounded", "Arial Rounded MT Bold", "Segoe UI Rounded", system-ui, sans-serif;
-  font-size: clamp(2.4rem, 7vw, 4.6rem);
-  font-weight: 800;
-  letter-spacing: 0.012em;
-  line-height: 1.06;
-  padding: 0.06em 0.12em 0.1em;
+  filter:
+    drop-shadow(0 0.055em 0 rgba(60, 61, 73, 0.88))
+    drop-shadow(0 0.13em 0.08em rgba(48, 49, 60, 0.24));
+  font-family: "Arial Rounded MT Bold", "SF Pro Rounded", "Trebuchet MS", sans-serif;
+  font-size: clamp(4rem, 14.5vw, 10.5rem);
+  font-weight: 900;
+  letter-spacing: 0.035em;
+  line-height: 0.86;
+  paint-order: stroke fill;
   text-align: center;
+  text-shadow:
+    -0.018em -0.018em 0 rgba(255, 255, 255, 0.98),
+    0.012em 0.012em 0 #dfe0e6,
+    0.026em 0.026em 0 #a9abb6,
+    0.04em 0.04em 0 #777986,
+    0.052em 0.052em 0 #50525f,
+    0.068em 0.068em 0 #858793,
+    0.085em 0.085em 0.025em rgba(43, 44, 54, 0.42);
   text-transform: uppercase;
   transition:
-    color 220ms ease,
     filter 220ms ease,
-    text-shadow 220ms ease,
-    transform 160ms ease;
+    transform 160ms ease,
+    -webkit-text-stroke-color 220ms ease;
   user-select: none;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: clamp(2px, 0.19vw, 3.5px) #777986;
 }
 
 .learn-games-hero .learn-balloon-title:hover {
@@ -4411,15 +4538,33 @@ h3 {
 }
 
 .learn-games-hero .learn-balloon-title.is-neon-on {
-  color: #0b6849;
+  background:
+    linear-gradient(
+      104deg,
+      #032d22 0%,
+      #0d6c4c 18%,
+      #39e69a 35%,
+      #07583f 54%,
+      #8affc4 70%,
+      #0b6849 84%,
+      #02291f 100%
+    );
   filter:
-    drop-shadow(0 0 0.05em rgba(203, 255, 226, 0.95))
-    drop-shadow(0 0 0.14em rgba(46, 255, 155, 0.9))
-    drop-shadow(0 0 0.3em rgba(13, 165, 103, 0.75));
+    drop-shadow(0 0 0.025em rgba(203, 255, 226, 1))
+    drop-shadow(0 0 0.07em rgba(46, 255, 155, 0.98))
+    drop-shadow(0 0 0.16em rgba(13, 165, 103, 0.9))
+    drop-shadow(0 0 0.34em rgba(4, 83, 58, 0.82))
+    drop-shadow(0 0.12em 0.08em rgba(0, 28, 20, 0.46));
   text-shadow:
-    0 0 0.05em rgba(214, 255, 234, 0.95),
-    0 0 0.13em rgba(36, 241, 147, 0.9),
-    0 0 0.3em rgba(12, 163, 99, 0.8);
+    -0.018em -0.018em 0 rgba(209, 255, 230, 0.98),
+    0.012em 0.012em 0 #34d68f,
+    0.026em 0.026em 0 #0a7652,
+    0.04em 0.04em 0 #054632,
+    0 0 0.045em #bcffda,
+    0 0 0.1em #24f193,
+    0 0 0.22em rgba(12, 163, 99, 0.95),
+    0 0 0.42em rgba(3, 74, 51, 0.86);
+  -webkit-text-stroke-color: #0c714f;
   animation: learn-neon-ignite 680ms steps(1, end) 1;
 }
 
@@ -7000,6 +7145,34 @@ button.certificate-preview.is-selected {
   width: 32px;
   height: 42px;
   color: var(--control-color);
+}
+
+/* Gleiches Signal wie am 3D-Tisch: Wer noch keinen Punkt hat, meldet sich.
+   Die Figur belegt bereits ::before und ::after, deshalb ein eigenes Element. */
+.council-speak-mark {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  color: #e5a200;
+  font-size: 1.55rem;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+  transform: translateX(-50%);
+  animation: council-speak-up 1.4s ease-in-out infinite;
+}
+
+@keyframes council-speak-up {
+  50% {
+    transform: translate(-50%, -3px);
+  }
+}
+
+.council-speaking-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.4;
 }
 
 .climate-person-symbol::before {

@@ -316,7 +316,7 @@ function createSatellite() {
   return satellite;
 }
 
-function createPerson(color, value, index) {
+function createPerson(color, value, index, wantsToSpeak = false) {
   const person = new THREE.Group();
   const body = new THREE.Group();
   const skinColors = [0x8b5c43, 0xb97855, 0xd4a47c, 0x6f4636, 0xe0b48e];
@@ -362,6 +362,27 @@ function createPerson(color, value, index) {
   person.userData.body = body;
   person.userData.growth = growth;
   person.add(body);
+
+  // Wer noch keine Stimme im Budget bekommen hat, meldet sich zu Wort. Das
+  // Ausrufezeichen haengt am Personen-Group statt am Koerper, damit es nicht
+  // mitwaechst und aus jeder Entfernung gleich gross bleibt.
+  const speechMark = new THREE.Group();
+  const markBar = taperedCylinder(0.11, 0.075, 0.46, 0xffc93c, 16, {
+    emissive: 0xffb703,
+    emissiveIntensity: 0.85,
+  });
+  markBar.position.y = 0.3;
+  const markDot = sphere(0.105, 0xffc93c, {
+    emissive: 0xffb703,
+    emissiveIntensity: 0.85,
+  });
+  markDot.position.y = -0.05;
+  speechMark.add(markBar, markDot);
+  speechMark.position.y = 2.05;
+  speechMark.visible = wantsToSpeak;
+  person.userData.speechMark = speechMark;
+  person.add(speechMark);
+
   return setShadows(person);
 }
 
@@ -1109,10 +1130,11 @@ function createClimateModel(root, values) {
 
   const people = new THREE.Group();
   const tokenGroups = [];
+  const speaking = new Set(Array.isArray(values.speaking) ? values.speaking : []);
   controls.forEach((control, index) => {
     const value = clamp(Number(values[control]) || 0, 0, 6);
     const angle = (index / controls.length) * Math.PI * 2 - Math.PI / 2;
-    const person = createPerson(colors[index], value, index);
+    const person = createPerson(colors[index], value, index, speaking.has(control));
     person.position.set(Math.cos(angle) * 4.35, -1.88, Math.sin(angle) * 4.35);
     person.rotation.y = -angle - Math.PI / 2;
     person.userData.phase = index * 1.15;
@@ -1202,6 +1224,12 @@ function createClimateModel(root, values) {
         participant.userData.body.rotation.z = Math.sin(time * 0.0013 + participant.userData.phase) * 0.018;
         const pulse = 1 + Math.sin(time * 0.0015 + participant.userData.phase) * 0.012;
         participant.userData.body.scale.setScalar(participant.userData.growth * pulse);
+        const speechMark = participant.userData.speechMark;
+        if (speechMark?.visible) {
+          // Auf und ab plus leichtes Drehen, damit die Meldung auffaellt.
+          speechMark.position.y = 2.05 + Math.sin(time * 0.004 + participant.userData.phase) * 0.12;
+          speechMark.rotation.y = time * 0.002;
+        }
       });
       tokenGroups.forEach((tokenGroup, index) => {
         tokenGroup.children.forEach((tokenDot, tokenIndex) => {

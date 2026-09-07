@@ -2060,6 +2060,12 @@ const content = {
       gamesIntro:
         "Choose 5, 15 or 30 minutes, then solve the environmental puzzles in order to unlock the next challenge.",
       gameChoose: "Challenge path",
+      gameMedalLabel: "Choose your medal",
+      sprintYourPick: "Your pick",
+      sprintFits: "Fits here",
+      sprintEffect: "What happens:",
+      gameMedalNote: "Bronze takes about 5 minutes, silver about 15 and gold about 30.",
+      councilSpeakingNote: "An exclamation mark shows who speaks up for the weakest of the four meters right now. Give that seat a token and watch where the mark moves next.",
       gameTimeLabel: "Choose time",
       gameTimeMinutes: "{count} min",
       gamePathProgress: "{complete} of {total} solved",
@@ -2710,6 +2716,12 @@ const content = {
       gamesIntro:
         "Wähle 5, 15 oder 30 Minuten und löse die Umwelt-Rätsel der Reihe nach, um die nächste Challenge freizuschalten.",
       gameChoose: "Challenge-Pfad",
+      gameMedalLabel: "Medaille wählen",
+      sprintYourPick: "Deine Wahl",
+      sprintFits: "Passt hier",
+      sprintEffect: "Was passiert:",
+      gameMedalNote: "Bronze dauert etwa 5 Minuten, Silber etwa 15 und Gold etwa 30.",
+      councilSpeakingNote: "Ein Ausrufezeichen zeigt, wer gerade für die schwächste der vier Anzeigen spricht. Gib diesem Platz einen Punkt und schau, wohin die Meldung wandert.",
       gameTimeLabel: "Zeit wählen",
       gameTimeMinutes: "{count} min",
       gamePathProgress: "{complete} von {total} gelöst",
@@ -5006,6 +5018,38 @@ function renderLearning3DStage(type, average) {
   `;
 }
 
+// Nach der Antwort wird die eigene Wahl der passenden gegenuebergestellt, damit
+// auch ein Fehlversuch zeigt, worum es bei beiden Zielen geht.
+function renderSprintOutcome(round, selected, correct) {
+  const picked = getSdgGoal(selected);
+  const target = getSdgGoal(round.answer);
+  const cards = correct
+    ? [[t("learn.sprintFits"), target]]
+    : [
+        [t("learn.sprintYourPick"), picked],
+        [t("learn.sprintFits"), target],
+      ];
+
+  return `
+    <div class="sprint-outcome">
+      ${cards
+        .map(
+          ([label, goal]) => `
+            <article class="sprint-outcome-card" style="--game-color: ${goal.color}">
+              <span>${escapeHtml(label)}</span>
+              <strong>SDG ${goal.number} · ${escapeHtml(localizedValue(goal.title))}</strong>
+            </article>
+          `
+        )
+        .join("")}
+    </div>
+    <p class="sprint-outcome-fact">
+      <em>${escapeHtml(t("learn.sprintEffect"))}</em>
+      ${escapeHtml(localizedValue(round.fact))}
+    </p>
+  `;
+}
+
 function renderSdgSprintGame() {
   const round = sdgSprintRounds[state.sdgSprintIndex] || sdgSprintRounds[0];
   const selected = state.sdgSprintAnswers[state.sdgSprintIndex];
@@ -5060,7 +5104,7 @@ function renderSdgSprintGame() {
               <strong>${escapeHtml(
                 t(correct ? "learn.gameCorrect" : "learn.incorrect")
               )}</strong>
-              ${correct ? `<p>${escapeHtml(localizedValue(round.fact))}</p>` : ""}
+              ${renderSprintOutcome(round, selected, correct)}
             </div>
             <div class="game-action-row">
               <button class="button button-secondary" type="button" data-sdg-sprint-reset>
@@ -5179,8 +5223,11 @@ function renderChainGame() {
     round.links
       .map((link, index) => {
         const active = state.chainPicks.includes(link.id);
+        // Das zuletzt gesetzte Glied wird hervorgehoben, damit sichtbar wird,
+        // was der eigene Klick in der Kette ausgeloest hat.
+        const justPlaced = active && index === state.chainPicks.length - 1;
         return `
-          <div class="chain-step${active ? " is-active" : ""}">
+          <div class="chain-step${active ? " is-active" : ""}${justPlaced ? " is-new" : ""}">
             <span>${String(index + 1).padStart(2, "0")}</span>
             <strong>${active ? escapeHtml(localizedValue(link.text)) : "..."}</strong>
           </div>
@@ -5393,6 +5440,8 @@ function renderClimateCouncilGame() {
   const average = Math.round(Object.values(metrics).reduce((sum, value) => sum + value, 0) / 4);
   const solved = climateGameSolved(metrics, average);
 
+  const speaking = new Set(councilMembersWantingToSpeak());
+
   return `
     <div class="game-play-panel final-game-panel">
       <div class="game-status-row">
@@ -5410,6 +5459,7 @@ function renderClimateCouncilGame() {
         resilience: t("learn.finalResilience"),
       })}
       ${renderLearning3DStage("climate", average)}
+      <p class="council-speaking-note">${escapeHtml(t("learn.councilSpeakingNote"))}</p>
       <div class="city-control-grid climate-control-grid">
         ${climateCouncilControls
           .map((control, index) => {
@@ -5418,7 +5468,7 @@ function renderClimateCouncilGame() {
             return `
               <article class="city-control-card climate-control-card" style="--control-color: ${CLIMATE_CONTROL_COLORS[index]}">
                 <div class="climate-control-copy">
-                  <span class="climate-person-symbol" aria-hidden="true"><i></i></span>
+                  <span class="climate-person-symbol" aria-hidden="true"><i></i>${speaking.has(control.id) ? '<b class="council-speak-mark">!</b>' : ""}</span>
                   <div>
                     <strong>${escapeHtml(title)}</strong>
                     <p>${escapeHtml(localizedValue(control.text))}</p>
@@ -5882,6 +5932,23 @@ function disposeLearning3DModel() {
   learningModelDispose = null;
 }
 
+// Es meldet sich, wer fuer den gerade schwaechsten der vier Werte zustaendig
+// ist. Damit wandert das Ausrufezeichen beim Spielen mit und zeigt genau den
+// Engpass, nach dem der Missions-Tipp fragt.
+function councilMembersWantingToSpeak() {
+  const metrics = ["climate", "nature", "justice", "resilience"];
+  const values = new Map(metrics.map((metric) => [metric, climateMetric(metric)]));
+  const lowest = Math.min(...values.values());
+  if (lowest >= CLIMATE_METRIC_FLOOR) return [];
+
+  return climateCouncilControls
+    .filter((control) => {
+      const strongest = Object.entries(control.effects).sort((a, b) => b[1] - a[1])[0]?.[0];
+      return strongest ? values.get(strongest) === lowest : false;
+    })
+    .map((control) => control.id);
+}
+
 function learning3DModelConfig(type) {
   if (type === "city") {
     return {
@@ -5907,7 +5974,7 @@ function learning3DModelConfig(type) {
   }
   if (type === "climate") {
     return {
-      values: { ...state.climatePlan },
+      values: { ...state.climatePlan, speaking: councilMembersWantingToSpeak() },
       label: t("learn.climateModelLabel"),
       onActivate: (id) => {
         if (changeClimatePlan(id, 1)) renderLearningGames();
@@ -5960,24 +6027,25 @@ function renderLearningGames() {
   const pathComplete = completedCount === sequenceIds.length;
 
   container.innerHTML = `
-    <section class="game-flow-panel">
-      <div>
-        <p class="eyebrow">${escapeHtml(t("learn.gameTimeLabel"))}</p>
-        <div class="game-time-row" role="group" aria-label="${escapeHtml(t("learn.gameTimeLabel"))}">
+    <aside class="game-menu" aria-label="${escapeHtml(t("learn.gameChoose"))}">
+      <div class="game-medal-select">
+        <p class="eyebrow">${escapeHtml(t("learn.gameMedalLabel"))}</p>
+        <div class="game-medal-row" role="group" aria-label="${escapeHtml(t("learn.gameMedalLabel"))}">
           ${learningGameTracks
             .map((track) => {
+              const tier = certificateTierForMinutes(track.minutes);
               const active = track.minutes === state.learningGameMinutes;
+              const earned = isCertificateTierEarned(tier);
               return `
                 <button
-                  class="game-time-button${active ? " is-active" : ""}"
+                  class="game-medal-button${active ? " is-active" : ""}${earned ? " is-earned" : ""}"
                   type="button"
                   data-game-duration="${track.minutes}"
                   aria-pressed="${active}"
+                  style="--medal-color: ${tier.color}; --medal-light: ${tier.light}"
                 >
-                  <strong>${escapeHtml(
-                    formatLearningText(t("learn.gameTimeMinutes"), { count: track.minutes })
-                  )}</strong>
-                  <span>${escapeHtml(localizedValue(track.description))}</span>
+                  <span class="game-medal-disc" aria-hidden="true"></span>
+                  <strong>${escapeHtml(localizedValue(tier.label))}</strong>
                 </button>
               `;
             })
@@ -5993,33 +6061,33 @@ function renderLearningGames() {
         )}</strong>
         <span>${escapeHtml(pathComplete ? t("learn.gamePathComplete") : localizedValue(activeLearningGameTrack().description))}</span>
       </div>
-    </section>
-    <aside class="game-menu" role="tablist" aria-label="${escapeHtml(t("learn.gameChoose"))}">
-      ${sequenceIds
-        .map((gameId, index) => {
-          const game = learningGames.find((item) => item.id === gameId) || learningGames[0];
-          const active = game.id === activeGame.id;
-          const locked = !isLearningGameUnlocked(game.id);
-          const complete = isLearningGameComplete(game.id);
-          return `
-            <button
-              class="game-tab${active ? " is-active" : ""}${locked ? " is-locked" : ""}${complete ? " is-complete" : ""}"
-              type="button"
-              role="tab"
-              aria-selected="${active}"
-              aria-disabled="${locked}"
-              data-learning-game="${escapeHtml(game.id)}"
-              ${locked ? "disabled" : ""}
-            >
-              <span>${String(index + 1).padStart(2, "0")} · ${escapeHtml(
-                complete ? t("learn.gameSolved") : locked ? t("learn.gameLocked") : localizedValue(game.tag)
-              )}</span>
-              <strong>${escapeHtml(localizedValue(game.title))}</strong>
-              <small>${escapeHtml(localizedValue(game.text))}</small>
-            </button>
-          `;
-        })
-        .join("")}
+      <div class="game-tab-list" role="tablist" aria-label="${escapeHtml(t("learn.gameChoose"))}">
+        ${sequenceIds
+          .map((gameId, index) => {
+            const game = learningGames.find((item) => item.id === gameId) || learningGames[0];
+            const active = game.id === activeGame.id;
+            const locked = !isLearningGameUnlocked(game.id);
+            const complete = isLearningGameComplete(game.id);
+            return `
+              <button
+                class="game-tab${active ? " is-active" : ""}${locked ? " is-locked" : ""}${complete ? " is-complete" : ""}"
+                type="button"
+                role="tab"
+                aria-selected="${active}"
+                aria-disabled="${locked}"
+                data-learning-game="${escapeHtml(game.id)}"
+                ${locked ? "disabled" : ""}
+              >
+                <span>${String(index + 1).padStart(2, "0")} · ${escapeHtml(
+                  complete ? t("learn.gameSolved") : locked ? t("learn.gameLocked") : localizedValue(game.tag)
+                )}</span>
+                <strong>${escapeHtml(localizedValue(game.title))}</strong>
+                <small>${escapeHtml(localizedValue(game.text))}</small>
+              </button>
+            `;
+          })
+          .join("")}
+      </div>
     </aside>
     <section class="game-stage" aria-live="polite">
       <div class="game-stage-heading">
@@ -6046,6 +6114,7 @@ function renderLearningGames() {
       ${(renderers[activeGame.id] || renderSdgSprintGame)()}
     </section>
     <div class="learning-reset-footer">
+      <p class="game-medal-note">${escapeHtml(t("learn.gameMedalNote"))}</p>
       <p>${escapeHtml(t("learn.resetNote"))}</p>
       <button class="button button-secondary" type="button" data-learning-games-reset>
         ${escapeHtml(t("learn.resetProgress"))}
