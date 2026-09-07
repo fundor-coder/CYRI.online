@@ -1426,14 +1426,14 @@ const climateCouncilControls = [
 ];
 const CLIMATE_CONTROL_COLORS = ["#f2c14e", "#2a7f9e", "#e56b5d", "#8fbd68", "#c971b8"];
 
-const CITY_GAME_TARGET = 69;
-const CITY_METRIC_FLOOR = 60;
+const CITY_GAME_TARGET = 66;
+const CITY_METRIC_FLOOR = 54;
 const CITY_BUDGET = 12;
-const REEF_GAME_TARGET = 65;
-const REEF_METRIC_FLOOR = 58;
+const REEF_GAME_TARGET = 58;
+const REEF_METRIC_FLOOR = 50;
 const REEF_BUDGET = 9;
-const CLIMATE_GAME_TARGET = 94;
-const CLIMATE_METRIC_FLOOR = 90;
+const CLIMATE_GAME_TARGET = 88;
+const CLIMATE_METRIC_FLOOR = 82;
 const CLIMATE_BUDGET = 14;
 
 const reefSynergies = [
@@ -2058,6 +2058,14 @@ const content = {
       gameChoose: "Challenge path",
       gameMedalLabel: "Choose your medal",
       gameStart: "Start the puzzle",
+      levelGoal: "Level goal",
+      levelReached: "Level reached",
+      levelEveryMeter: "Every meter at least {value}%",
+      levelAverage: "Average at least {value}%",
+      levelBudget: "All tokens planned",
+      levelEverySeat: "Every seat funded",
+      levelSynergy: "At least one synergy active",
+      levelContinue: "Unlock the next puzzle",
       gameAutoNext: "Correct - the next round starts by itself.",
       gameFinishing: "Correct - finishing the puzzle.",
       sprintYourPick: "Your pick",
@@ -2091,10 +2099,7 @@ const content = {
       gameTargetAt: "Continue from {count}%",
       gameTargetReached: "Target reached. You can continue now.",
       gameTargetRemaining: "{count} percentage points to go.",
-      gameHiddenGoal: "Hidden mission threshold",
-      gameHiddenGoalIntro: "The exact solution stays hidden. Build a plan, test it and use the clue to improve your next attempt.",
-      gameAttempts: "Checks: {count}",
-      gameTestPlan: "Test plan",
+      synergyUndiscovered: "Not discovered yet",
       gameUseFullBudget: "The plan is not ambitious enough yet. Use the remaining {count} points.",
       gameKeepEveryCategory: "One field was reduced to zero. A robust package must keep every field active.",
       gameFindSynergy: "The individual actions are useful, but the decisive hidden synergy is still missing.",
@@ -2713,6 +2718,14 @@ const content = {
       gameChoose: "Challenge-Pfad",
       gameMedalLabel: "Medaille wählen",
       gameStart: "Rätsel starten",
+      levelGoal: "Levelziel",
+      levelReached: "Level geschafft",
+      levelEveryMeter: "Jede Anzeige mindestens {value}%",
+      levelAverage: "Durchschnitt mindestens {value}%",
+      levelBudget: "Alle Token verplant",
+      levelEverySeat: "Jeder Platz bekommt etwas",
+      levelSynergy: "Mindestens eine Synergie aktiv",
+      levelContinue: "Nächstes Rätsel freischalten",
       gameAutoNext: "Richtig – die nächste Runde startet von selbst.",
       gameFinishing: "Richtig – das Rätsel wird abgeschlossen.",
       sprintYourPick: "Deine Wahl",
@@ -2746,10 +2759,7 @@ const content = {
       gameTargetAt: "Weiter ab {count}%",
       gameTargetReached: "Ziel erreicht. Du kannst jetzt weitergehen.",
       gameTargetRemaining: "Noch {count} Prozentpunkte bis zum Weitergehen.",
-      gameHiddenGoal: "Verdeckte Missionsgrenze",
-      gameHiddenGoalIntro: "Die exakte Lösung bleibt verborgen. Baue einen Plan, prüfe ihn und nutze den Hinweis für deinen nächsten Versuch.",
-      gameAttempts: "Prüfversuche: {count}",
-      gameTestPlan: "Plan prüfen",
+      synergyUndiscovered: "Noch nicht entdeckt",
       gameUseFullBudget: "Der Plan ist noch nicht ambitioniert genug. Nutze die übrigen {count} Punkte.",
       gameKeepEveryCategory: "Ein Bereich wurde auf null gesetzt. Ein robustes Paket muss jeden Bereich einbeziehen.",
       gameFindSynergy: "Die Einzelmaßnahmen helfen, aber die entscheidende versteckte Synergie fehlt noch.",
@@ -3300,16 +3310,6 @@ const state = {
     water: 2,
     routes: 2,
   },
-  puzzleAttempts: {
-    city: 0,
-    reef: 0,
-    climate: 0,
-  },
-  puzzleFeedback: {
-    city: null,
-    reef: null,
-    climate: null,
-  },
   reefActions: [],
   climatePlan: {
     energy: 1,
@@ -3458,8 +3458,6 @@ function resetLearningGameRun(minutes = state.learningGameMinutes) {
   state.chainRoundMisses = 0;
   state.chainFeedback = "";
   state.cityPlan = { shade: 2, soil: 2, water: 2, routes: 2 };
-  state.puzzleAttempts = { city: 0, reef: 0, climate: 0 };
-  state.puzzleFeedback = { city: null, reef: null, climate: null };
   state.learningGameCelebration = null;
   state.reefActions = [];
   state.climatePlan = { energy: 1, mobility: 1, food: 1, nature: 1, fairness: 1 };
@@ -3665,21 +3663,6 @@ function weakestMetricId(metrics) {
   )[0];
 }
 
-function puzzleFeedbackText(feedback, metricLabels) {
-  if (!feedback) return t("learn.gameHiddenGoalIntro");
-  if (feedback.reason === "budget") {
-    return formatLearningText(t("learn.gameUseFullBudget"), { count: feedback.remaining });
-  }
-  if (feedback.reason === "category") return t("learn.gameKeepEveryCategory");
-  if (feedback.reason === "synergy") return t("learn.gameFindSynergy");
-  if (feedback.reason === "weak") {
-    return formatLearningText(t("learn.gameWeakestArea"), {
-      area: metricLabels[feedback.metric] || feedback.metric,
-    });
-  }
-  return t("learn.gameNeedsBalance");
-}
-
 function gameTipText(game, metricLabels = {}) {
   const tips = learningGameTips[game];
   if (!tips) return null;
@@ -3697,7 +3680,7 @@ function gameTipText(game, metricLabels = {}) {
     return localizedValue(state.chainPicks.length ? tips.progress : tips.initial);
   }
 
-  const feedback = state.puzzleFeedback[game === "city-builder" ? "city" : game === "reef-rescue" ? "reef" : "climate"];
+  const feedback = currentPuzzleFeedback(game);
   if (!feedback) return localizedValue(tips.initial);
   if (feedback.reason === "budget") {
     return localizedValue(tips.budget);
@@ -3731,43 +3714,73 @@ function renderGameTip(game, metricLabels) {
   `;
 }
 
-function renderPuzzleGate(game, metricLabels) {
-  const attempts = state.puzzleAttempts[game] || 0;
-  const feedback = state.puzzleFeedback[game];
-  const gameIds = {
-    city: "city-builder",
-    reef: "reef-rescue",
-    climate: "climate-council",
-  };
-  const complete = isLearningGameComplete(gameIds[game]);
-  if (complete) {
-    return `
-      <div class="puzzle-gate is-solved" role="status">
-        <div>
-          <span aria-hidden="true">✓</span>
-          <div>
-            <strong>${escapeHtml(t("learn.gameCongratulations"))}</strong>
-            <p>${escapeHtml(t("learn.gameCongratulationsText"))}</p>
-          </div>
-        </div>
-        <small>${escapeHtml(
-          formatLearningText(t("learn.gameAttempts"), { count: attempts })
-        )}</small>
-      </div>
-    `;
+// Ohne Pruef-Knopf gibt es keinen gespeicherten Rueckmeldungsgrund mehr: der
+// Tipp leitet sich direkt aus dem aktuellen Plan ab und passt sich sofort an.
+function currentPuzzleFeedback(gameId) {
+  if (gameId === "city-builder") {
+    const metrics = {
+      cooling: cityMetric("cooling"),
+      flood: cityMetric("flood"),
+      habitat: cityMetric("habitat"),
+      fairness: cityMetric("fairness"),
+    };
+    if (cityPlanTotal() < CITY_BUDGET) {
+      return { reason: "budget", remaining: CITY_BUDGET - cityPlanTotal() };
+    }
+    if (Object.values(metrics).some((value) => value < CITY_METRIC_FLOOR)) {
+      return { reason: "weak", metric: weakestMetricId(metrics) };
+    }
+    return { reason: "balance", metric: weakestMetricId(metrics) };
   }
+
+  if (gameId === "reef-rescue") {
+    const metrics = {
+      recovery: reefMetric("recovery"),
+      pressure: reefMetric("pressure"),
+      community: reefMetric("community"),
+    };
+    if (activeReefSynergies().length === 0) return { reason: "synergy" };
+    if (Object.values(metrics).some((value) => value < REEF_METRIC_FLOOR)) {
+      return { reason: "weak", metric: weakestMetricId(metrics) };
+    }
+    return { reason: "balance", metric: weakestMetricId(metrics) };
+  }
+
+  const metrics = {
+    climate: climateMetric("climate"),
+    nature: climateMetric("nature"),
+    justice: climateMetric("justice"),
+    resilience: climateMetric("resilience"),
+  };
+  if (climatePlanTotal() < CLIMATE_BUDGET) {
+    return { reason: "budget", remaining: CLIMATE_BUDGET - climatePlanTotal() };
+  }
+  if (Object.values(metrics).some((value) => value < CLIMATE_METRIC_FLOOR)) {
+    return { reason: "weak", metric: weakestMetricId(metrics) };
+  }
+  return { reason: "balance", metric: weakestMetricId(metrics) };
+}
+
+function renderLevelGoal(gameId, conditions) {
+  const solved = isLearningGameComplete(gameId);
+  const met = conditions.every((condition) => condition.met);
+
   return `
-    <div class="puzzle-gate${feedback ? " has-result" : ""}" role="status">
-      <div>
-        <span aria-hidden="true">?</span>
-        <div>
-          <strong>${escapeHtml(t("learn.gameHiddenGoal"))}</strong>
-          <p>${escapeHtml(puzzleFeedbackText(feedback, metricLabels))}</p>
-        </div>
-      </div>
-      <small>${escapeHtml(
-        formatLearningText(t("learn.gameAttempts"), { count: attempts })
-      )}</small>
+    <div class="level-goal${met ? " is-reached" : ""}">
+      <strong>${escapeHtml(t(solved ? "learn.levelReached" : "learn.levelGoal"))}</strong>
+      <ul>
+        ${conditions
+          .map(
+            (condition) => `
+              <li class="${condition.met ? "is-met" : ""}">
+                <span aria-hidden="true">${condition.met ? "✓" : "○"}</span>
+                <span>${escapeHtml(condition.label)}</span>
+                <b>${escapeHtml(condition.value)}</b>
+              </li>
+            `
+          )
+          .join("")}
+      </ul>
     </div>
   `;
 }
@@ -5333,21 +5346,32 @@ function renderCityBuilderGame() {
         ${renderGameMeter(t("learn.cityHabitat"), metrics.habitat)}
         ${renderGameMeter(t("learn.cityFairness"), metrics.fairness)}
       </div>
-      ${renderPuzzleGate("city", {
-        cooling: t("learn.cityCooling"),
-        flood: t("learn.cityFlood"),
-        habitat: t("learn.cityHabitat"),
-        fairness: t("learn.cityFairness"),
-      })}
+      ${renderLevelGoal("city-builder", [
+        {
+          label: formatLearningText(t("learn.levelEveryMeter"), { value: CITY_METRIC_FLOOR }),
+          value: `${Math.min(...Object.values(metrics))}%`,
+          met: Object.values(metrics).every((value) => value >= CITY_METRIC_FLOOR),
+        },
+        {
+          label: formatLearningText(t("learn.levelAverage"), { value: CITY_GAME_TARGET }),
+          value: `${average}%`,
+          met: average >= CITY_GAME_TARGET,
+        },
+        {
+          label: t("learn.levelBudget"),
+          value: `${used}/${budget}`,
+          met: used === budget,
+        },
+      ])}
       <div class="game-action-row">
         <button class="button button-secondary" type="button" data-city-reset>
           ${escapeHtml(t("learn.gameReset"))}
         </button>
         <button class="button button-primary" type="button" data-city-complete ${
-          isLearningGameComplete("city-builder") ? "disabled" : ""
+          isLearningGameComplete("city-builder") || !solved ? "disabled" : ""
         }>
           ${escapeHtml(
-            t(isLearningGameComplete("city-builder") ? "learn.gameComplete" : "learn.gameTestPlan")
+            t(isLearningGameComplete("city-builder") ? "learn.gameComplete" : "learn.levelContinue")
           )}
         </button>
       </div>
@@ -5415,7 +5439,7 @@ function renderReefRescueGame() {
             const active = synergy.pair.every((id) => state.reefActions.includes(id));
             return `<p class="game-rule ${active ? "is-met" : "is-open"}">
               <b aria-hidden="true">${active ? "✓" : "?"}</b> ${escapeHtml(
-                active ? localizedValue(synergy.text) : t("learn.gameHiddenGoal")
+                active ? localizedValue(synergy.text) : t("learn.synergyUndiscovered")
               )}
             </p>`;
           })
@@ -5426,20 +5450,32 @@ function renderReefRescueGame() {
         ${renderGameMeter(t("learn.reefPressure"), pressure)}
         ${renderGameMeter(t("learn.reefCommunity"), community)}
       </div>
-      ${renderPuzzleGate("reef", {
-        recovery: t("learn.reefRecovery"),
-        pressure: t("learn.reefPressure"),
-        community: t("learn.reefCommunity"),
-      })}
+      ${renderLevelGoal("reef-rescue", [
+        {
+          label: formatLearningText(t("learn.levelEveryMeter"), { value: REEF_METRIC_FLOOR }),
+          value: `${Math.min(recovery, pressure, community)}%`,
+          met: [recovery, pressure, community].every((value) => value >= REEF_METRIC_FLOOR),
+        },
+        {
+          label: formatLearningText(t("learn.levelAverage"), { value: REEF_GAME_TARGET }),
+          value: `${average}%`,
+          met: average >= REEF_GAME_TARGET,
+        },
+        {
+          label: t("learn.levelSynergy"),
+          value: String(activeReefSynergies().length),
+          met: activeReefSynergies().length >= 1,
+        },
+      ])}
       <div class="game-action-row">
         <button class="button button-secondary" type="button" data-reef-reset>
           ${escapeHtml(t("learn.gameReset"))}
         </button>
         <button class="button button-primary" type="button" data-reef-complete ${
-          isLearningGameComplete("reef-rescue") ? "disabled" : ""
+          isLearningGameComplete("reef-rescue") || !solved ? "disabled" : ""
         }>
           ${escapeHtml(
-            t(isLearningGameComplete("reef-rescue") ? "learn.gameComplete" : "learn.gameTestPlan")
+            t(isLearningGameComplete("reef-rescue") ? "learn.gameComplete" : "learn.levelContinue")
           )}
         </button>
       </div>
@@ -5512,19 +5548,35 @@ function renderClimateCouncilGame() {
         ${renderGameMeter(t("learn.finalJustice"), metrics.justice)}
         ${renderGameMeter(t("learn.finalResilience"), metrics.resilience)}
       </div>
-      ${renderPuzzleGate("climate", {
-        climate: t("learn.finalClimate"),
-        nature: t("learn.finalNature"),
-        justice: t("learn.finalJustice"),
-        resilience: t("learn.finalResilience"),
-      })}
+      ${renderLevelGoal("climate-council", [
+        {
+          label: formatLearningText(t("learn.levelEveryMeter"), { value: CLIMATE_METRIC_FLOOR }),
+          value: `${Math.min(...Object.values(metrics))}%`,
+          met: Object.values(metrics).every((value) => value >= CLIMATE_METRIC_FLOOR),
+        },
+        {
+          label: formatLearningText(t("learn.levelAverage"), { value: CLIMATE_GAME_TARGET }),
+          value: `${average}%`,
+          met: average >= CLIMATE_GAME_TARGET,
+        },
+        {
+          label: t("learn.levelBudget"),
+          value: `${used}/${budget}`,
+          met: used === budget,
+        },
+        {
+          label: t("learn.levelEverySeat"),
+          value: String(Object.values(state.climatePlan).filter((value) => value >= 1).length),
+          met: Object.values(state.climatePlan).every((value) => value >= 1),
+        },
+      ])}
       <div class="game-action-row">
         <button class="button button-secondary" type="button" data-climate-reset>${escapeHtml(t("learn.gameReset"))}</button>
         <button class="button button-primary" type="button" data-climate-complete ${
-          isLearningGameComplete("climate-council") ? "disabled" : ""
+          isLearningGameComplete("climate-council") || !solved ? "disabled" : ""
         }>
           ${escapeHtml(
-            t(isLearningGameComplete("climate-council") ? "learn.gameComplete" : "learn.gameTestPlan")
+            t(isLearningGameComplete("climate-council") ? "learn.gameComplete" : "learn.levelContinue")
           )}
         </button>
       </div>
@@ -7484,7 +7536,6 @@ document.addEventListener("click", (event) => {
 
   if (event.target.closest("[data-city-reset]")) {
     state.cityPlan = { shade: 2, soil: 2, water: 2, routes: 2 };
-    state.puzzleFeedback.city = null;
     renderLearningGames();
     return;
   }
@@ -7499,22 +7550,8 @@ document.addEventListener("click", (event) => {
     const average = Math.round(
       (metrics.cooling + metrics.flood + metrics.habitat + metrics.fairness) / 4
     );
-    state.puzzleAttempts.city += 1;
-    if (cityGameSolved(metrics, average)) {
-      completeLearningGame("city-builder");
-    } else if (cityPlanTotal() < CITY_BUDGET) {
-      state.puzzleFeedback.city = {
-        reason: "budget",
-        remaining: CITY_BUDGET - cityPlanTotal(),
-      };
-    } else {
-      state.puzzleFeedback.city = {
-        reason: Object.values(metrics).some((value) => value < CITY_METRIC_FLOOR)
-          ? "weak"
-          : "balance",
-        metric: weakestMetricId(metrics),
-      };
-    }
+    if (!cityGameSolved(metrics, average)) return;
+    completeLearningGame("city-builder");
     renderLearningGames();
     return;
   }
@@ -7528,7 +7565,6 @@ document.addEventListener("click", (event) => {
 
   if (event.target.closest("[data-reef-reset]")) {
     state.reefActions = [];
-    state.puzzleFeedback.reef = null;
     renderLearningGames();
     return;
   }
@@ -7538,20 +7574,8 @@ document.addEventListener("click", (event) => {
     const pressure = reefMetric("pressure");
     const community = reefMetric("community");
     const average = Math.round((recovery + pressure + community) / 3);
-    const metrics = { recovery, pressure, community };
-    state.puzzleAttempts.reef += 1;
-    if (reefGameSolved(recovery, pressure, community, average)) {
-      completeLearningGame("reef-rescue");
-    } else if (activeReefSynergies().length === 0) {
-      state.puzzleFeedback.reef = { reason: "synergy" };
-    } else {
-      state.puzzleFeedback.reef = {
-        reason: Object.values(metrics).some((value) => value < REEF_METRIC_FLOOR)
-          ? "weak"
-          : "balance",
-        metric: weakestMetricId(metrics),
-      };
-    }
+    if (!reefGameSolved(recovery, pressure, community, average)) return;
+    completeLearningGame("reef-rescue");
     renderLearningGames();
     return;
   }
@@ -7566,7 +7590,6 @@ document.addEventListener("click", (event) => {
 
   if (event.target.closest("[data-climate-reset]")) {
     state.climatePlan = { energy: 1, mobility: 1, food: 1, nature: 1, fairness: 1 };
-    state.puzzleFeedback.climate = null;
     renderLearningGames();
     return;
   }
@@ -7579,24 +7602,8 @@ document.addEventListener("click", (event) => {
       resilience: climateMetric("resilience"),
     };
     const average = Math.round(Object.values(metrics).reduce((sum, value) => sum + value, 0) / 4);
-    state.puzzleAttempts.climate += 1;
-    if (climateGameSolved(metrics, average)) {
-      completeLearningGame("climate-council");
-    } else if (climatePlanTotal() < CLIMATE_BUDGET) {
-      state.puzzleFeedback.climate = {
-        reason: "budget",
-        remaining: CLIMATE_BUDGET - climatePlanTotal(),
-      };
-    } else if (Object.values(state.climatePlan).some((value) => value < 1)) {
-      state.puzzleFeedback.climate = { reason: "category" };
-    } else {
-      state.puzzleFeedback.climate = {
-        reason: Object.values(metrics).some((value) => value < CLIMATE_METRIC_FLOOR)
-          ? "weak"
-          : "balance",
-        metric: weakestMetricId(metrics),
-      };
-    }
+    if (!climateGameSolved(metrics, average)) return;
+    completeLearningGame("climate-council");
     renderLearningGames();
     return;
   }

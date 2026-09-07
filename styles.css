@@ -3115,82 +3115,66 @@ h3 {
   font-weight: 680;
 }
 
-.puzzle-gate {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px 18px;
-  align-items: center;
-  justify-content: space-between;
-  border: 1px dashed rgba(39, 116, 216, 0.34);
-  border-left: 5px solid var(--blue);
-  border-radius: var(--game-radius-md);
-  background:
-    repeating-linear-gradient(
-      -45deg,
-      rgba(39, 116, 216, 0.025) 0,
-      rgba(39, 116, 216, 0.025) 8px,
-      transparent 8px,
-      transparent 16px
-    ),
-    rgba(255, 255, 255, 0.76);
-  padding: 15px 16px;
+/* Offenes Levelziel: jede Bedingung mit aktuellem Wert und Marke. Der
+   Weiter-Knopf wird klickbar, sobald alle Haken sitzen. */
+.level-goal {
+  display: grid;
+  gap: 10px;
+  border: 1px solid rgba(39, 116, 216, 0.2);
+  border-radius: var(--game-radius-lg);
+  background: rgba(39, 116, 216, 0.06);
+  padding: 16px 18px;
 }
 
-.puzzle-gate.has-result {
-  border-style: solid;
-  border-left-color: #b97622;
-  background: #fff8e8;
-}
-
-.puzzle-gate.is-solved {
-  border-style: solid;
+.level-goal.is-reached {
   border-color: rgba(22, 131, 95, 0.3);
-  border-left-color: var(--green);
-  background: #e8f5ed;
+  background: rgba(22, 131, 95, 0.09);
 }
 
-.puzzle-gate.is-solved > div > span {
-  background: var(--green);
+.level-goal > strong {
+  color: var(--blue);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.puzzle-gate > div {
+.level-goal.is-reached > strong {
+  color: var(--green);
+}
+
+.level-goal ul {
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr);
-  gap: 11px;
-  align-items: start;
-  flex: 1 1 420px;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.puzzle-gate > div > span {
+.level-goal li {
   display: grid;
-  width: 32px;
-  height: 32px;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--blue);
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 850;
-}
-
-.puzzle-gate strong {
-  color: var(--ink);
-}
-
-.puzzle-gate p {
-  margin: 3px 0 0;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 8px;
   color: var(--ink-soft);
-  line-height: 1.45;
+  font-size: 0.92rem;
 }
 
-.puzzle-gate small {
-  border-radius: 999px;
-  background: rgba(18, 22, 29, 0.08);
-  color: var(--ink);
-  padding: 6px 10px;
-  font-size: 0.78rem;
+.level-goal li > span:first-child {
+  color: rgba(46, 60, 70, 0.4);
   font-weight: 760;
+}
+
+.level-goal li.is-met {
+  color: var(--ink);
+}
+
+.level-goal li.is-met > span:first-child {
+  color: var(--green);
+}
+
+.level-goal li b {
   font-variant-numeric: tabular-nums;
+  font-weight: 760;
 }
 
 .game-rule {
