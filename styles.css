@@ -2491,6 +2491,29 @@ h3 {
   font-size: 0.84rem;
 }
 
+/* Laeuft das erste Raetsel, bleibt im Feld nur das Spiel selbst stehen. */
+.game-stage.is-focus .game-stage-heading,
+.game-stage.is-focus .game-context {
+  display: none;
+}
+
+.game-start-panel {
+  display: grid;
+  justify-items: start;
+  gap: 16px;
+}
+
+.game-start-button {
+  justify-self: start;
+}
+
+.game-autonext {
+  margin: 12px 0 0;
+  color: var(--green);
+  font-size: 0.92rem;
+  font-weight: 560;
+}
+
 /* Rueckmeldung im SDG-Sprint: eigene Wahl und passendes Ziel nebeneinander. */
 .sprint-outcome {
   display: grid;
@@ -4452,11 +4475,12 @@ h3 {
 
 .learn-games-hero {
   display: grid;
-  min-height: clamp(300px, 42vw, 520px);
+  /* Knapp bemessen, damit der Spielbereich fast direkt unter dem Schild beginnt. */
+  min-height: 0;
   place-items: center;
   overflow: hidden;
-  padding-top: clamp(80px, 10vw, 122px);
-  padding-bottom: clamp(70px, 9vw, 112px);
+  padding-top: clamp(58px, 6vw, 78px);
+  padding-bottom: clamp(14px, 2vw, 26px);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(247, 251, 250, 0.5)),
     linear-gradient(125deg, rgba(39, 116, 216, 0.12), rgba(22, 131, 95, 0.1), rgba(246, 205, 92, 0.1));
@@ -4584,7 +4608,7 @@ h3 {
 }
 
 .learn-games-hero + .game-section {
-  padding-top: 56px;
+  padding-top: 18px;
 }
 
 .filter-row {

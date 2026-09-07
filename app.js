@@ -2055,12 +2055,11 @@ const content = {
       sdgNoConnection:
         "No map model yet. This goal still helps you compare resources, risks and fairness.",
       sdgMapButton: "Open map model",
-      gamesEyebrow: "Play, decide, understand",
-      gamesTitle: "Choose an environmental challenge.",
-      gamesIntro:
-        "Choose 5, 15 or 30 minutes, then solve the environmental puzzles in order to unlock the next challenge.",
       gameChoose: "Challenge path",
       gameMedalLabel: "Choose your medal",
+      gameStart: "Start the puzzle",
+      gameAutoNext: "Correct - the next round starts by itself.",
+      gameFinishing: "Correct - finishing the puzzle.",
       sprintYourPick: "Your pick",
       sprintFits: "Fits here",
       sprintEffect: "What happens:",
@@ -2711,12 +2710,11 @@ const content = {
       sdgNoConnection:
         "Noch kein Kartenmodell. Dieses Ziel hilft trotzdem, Ressourcen, Risiken und Fairness zu vergleichen.",
       sdgMapButton: "Kartenmodell öffnen",
-      gamesEyebrow: "Spielen, entscheiden, verstehen",
-      gamesTitle: "Wähle eine Umwelt-Challenge.",
-      gamesIntro:
-        "Wähle 5, 15 oder 30 Minuten und löse die Umwelt-Rätsel der Reihe nach, um die nächste Challenge freizuschalten.",
       gameChoose: "Challenge-Pfad",
       gameMedalLabel: "Medaille wählen",
+      gameStart: "Rätsel starten",
+      gameAutoNext: "Richtig – die nächste Runde startet von selbst.",
+      gameFinishing: "Richtig – das Rätsel wird abgeschlossen.",
       sprintYourPick: "Deine Wahl",
       sprintFits: "Passt hier",
       sprintEffect: "Was passiert:",
@@ -3289,6 +3287,7 @@ const state = {
   learningGameCelebration: null,
   activeLearningGame: learningGames[0].id,
   sdgSprintIndex: 0,
+  sdgSprintStarted: false,
   sdgSprintAnswers: [],
   chainRound: 0,
   chainPicks: [],
@@ -3451,6 +3450,7 @@ function resetLearningGameRun(minutes = state.learningGameMinutes) {
   state.selectedCertificateTier = certificateTierForMinutes(minutes).id;
   state.activeLearningGame = nextUnlockedLearningGameId() || activeLearningGameIds().at(-1);
   state.sdgSprintIndex = 0;
+  state.sdgSprintStarted = false;
   state.sdgSprintAnswers = [];
   state.chainRound = 0;
   state.chainPicks = [];
@@ -5020,6 +5020,20 @@ function renderLearning3DStage(type, average) {
 
 // Nach der Antwort wird die eigene Wahl der passenden gegenuebergestellt, damit
 // auch ein Fehlversuch zeigt, worum es bei beiden Zielen geht.
+let sprintAdvanceTimer = 0;
+
+function advanceSdgSprint() {
+  const round = sdgSprintRounds[state.sdgSprintIndex] || sdgSprintRounds[0];
+  if (state.sdgSprintAnswers[state.sdgSprintIndex] !== round.answer) return;
+
+  if (state.sdgSprintIndex < sdgSprintRounds.length - 1) {
+    state.sdgSprintIndex += 1;
+  } else {
+    completeLearningGame("sdg-sprint");
+  }
+  renderLearningGames();
+}
+
 function renderSprintOutcome(round, selected, correct) {
   const picked = getSdgGoal(selected);
   const target = getSdgGoal(round.answer);
@@ -5051,6 +5065,17 @@ function renderSprintOutcome(round, selected, correct) {
 }
 
 function renderSdgSprintGame() {
+  if (!state.sdgSprintStarted) {
+    return `
+      <div class="game-play-panel game-start-panel">
+        ${renderGameTip("sdg-sprint")}
+        <button class="button button-primary game-start-button" type="button" data-sdg-sprint-start>
+          ${escapeHtml(t("learn.gameStart"))}
+        </button>
+      </div>
+    `;
+  }
+
   const round = sdgSprintRounds[state.sdgSprintIndex] || sdgSprintRounds[0];
   const selected = state.sdgSprintAnswers[state.sdgSprintIndex];
   const answered = Number.isInteger(selected);
@@ -5072,7 +5097,6 @@ function renderSdgSprintGame() {
         )}</span>
         <strong>${escapeHtml(t("learn.gameScore"))}: ${score}/${sdgSprintRounds.length}</strong>
       </div>
-      ${renderGameTip("sdg-sprint")}
       <div class="game-prompt">
         <p>${escapeHtml(localizedValue(round.prompt))}</p>
       </div>
@@ -5106,24 +5130,20 @@ function renderSdgSprintGame() {
               )}</strong>
               ${renderSprintOutcome(round, selected, correct)}
             </div>
-            <div class="game-action-row">
-              <button class="button button-secondary" type="button" data-sdg-sprint-reset>
-                ${escapeHtml(t("learn.gameReset"))}
-              </button>
-              ${
-                correct
-                  ? `<button class="button button-primary" type="button" data-sdg-sprint-next>
-                      ${escapeHtml(
-                        lastRound
-                          ? learningGameCompletionLabel("sdg-sprint")
-                          : t("learn.gameNext")
-                      )}
-                    </button>`
-                  : `<button class="button button-primary" type="button" data-sdg-sprint-retry>
+            ${
+              correct
+                ? `<p class="game-autonext" aria-live="polite">${escapeHtml(
+                    t(lastRound ? "learn.gameFinishing" : "learn.gameAutoNext")
+                  )}</p>`
+                : `<div class="game-action-row">
+                    <button class="button button-secondary" type="button" data-sdg-sprint-reset>
+                      ${escapeHtml(t("learn.gameReset"))}
+                    </button>
+                    <button class="button button-primary" type="button" data-sdg-sprint-retry>
                       ${escapeHtml(t("learn.gameTryAgain"))}
-                    </button>`
-              }
-            </div>`
+                    </button>
+                  </div>`
+            }`
           : ""
       }
     </div>
@@ -6004,6 +6024,7 @@ async function syncLearning3DModel() {
 function renderLearningGames() {
   const container = document.querySelector("[data-learning-games]");
   if (!container) return;
+  window.clearTimeout(sprintAdvanceTimer);
   disposeLearning3DModel();
 
   const sequenceIds = activeLearningGameIds();
@@ -6089,7 +6110,9 @@ function renderLearningGames() {
           .join("")}
       </div>
     </aside>
-    <section class="game-stage" aria-live="polite">
+    <section class="game-stage${
+      activeGame.id === "sdg-sprint" && state.sdgSprintStarted ? " is-focus" : ""
+    }" aria-live="polite">
       <div class="game-stage-heading">
         <span>${escapeHtml(localizedValue(activeGame.tag))}</span>
         <h3>${escapeHtml(localizedValue(activeGame.title))}</h3>
@@ -7370,21 +7393,19 @@ document.addEventListener("click", (event) => {
 
   const sdgSprintButton = event.target.closest("[data-sdg-sprint-option]");
   if (sdgSprintButton) {
-    state.sdgSprintAnswers[state.sdgSprintIndex] = Number(sdgSprintButton.dataset.sdgSprintOption);
+    const picked = Number(sdgSprintButton.dataset.sdgSprintOption);
+    state.sdgSprintAnswers[state.sdgSprintIndex] = picked;
     renderLearningGames();
+    // Bei einer richtigen Antwort bleibt die Rueckmeldung kurz stehen und die
+    // naechste Runde kommt von selbst - kein zusaetzlicher Klick noetig.
+    if (picked === (sdgSprintRounds[state.sdgSprintIndex] || sdgSprintRounds[0]).answer) {
+      sprintAdvanceTimer = window.setTimeout(advanceSdgSprint, 2200);
+    }
     return;
   }
 
-  if (event.target.closest("[data-sdg-sprint-next]")) {
-    const round = sdgSprintRounds[state.sdgSprintIndex] || sdgSprintRounds[0];
-    const selected = state.sdgSprintAnswers[state.sdgSprintIndex];
-    if (selected !== round.answer) return;
-
-    if (state.sdgSprintIndex < sdgSprintRounds.length - 1) {
-      state.sdgSprintIndex += 1;
-    } else {
-      completeLearningGame("sdg-sprint");
-    }
+  if (event.target.closest("[data-sdg-sprint-start]")) {
+    state.sdgSprintStarted = true;
     renderLearningGames();
     return;
   }
@@ -7398,6 +7419,7 @@ document.addEventListener("click", (event) => {
   if (event.target.closest("[data-sdg-sprint-reset]")) {
     state.sdgSprintIndex = 0;
     state.sdgSprintAnswers = [];
+    state.sdgSprintStarted = false;
     renderLearningGames();
     return;
   }
